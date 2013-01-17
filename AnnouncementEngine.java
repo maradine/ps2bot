@@ -6,8 +6,8 @@ public class AnnouncementEngine implements Runnable {
 	private ArrayList<String> content;
 	private PircBotX bot;
 	private String channel;
-	boolean onSwitch;
-	int interval;
+	private boolean onSwitch;
+	private int interval;
 
 	public AnnouncementEngine(PircBotX bot, String channel) {
 		content = new ArrayList<String>();
