@@ -58,6 +58,11 @@ public class PS2Bot extends ListenerAdapter {
 		bot.setName(botnick);
 		bot.connect(server);
 		bot.joinChannel(channel);
+		
+		String pass = props.getProperty("nickpass");
+		if (pass != null) {
+			bot.identify(pass);
+		}
 
 		//set up announcement engine
 		AnnouncementEngine ae = new AnnouncementEngine(bot, channel);
