@@ -1,35 +1,35 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 import org.pircbotx.PircBotX;
 
 public class AnnouncementEngine implements Runnable {
 
-	private ArrayList<String> content;
+	private LinkedList<String> content;
 	private PircBotX bot;
 	private String channel;
 	private boolean onSwitch;
-	private int interval;
+	private long interval;
 
 	public AnnouncementEngine(PircBotX bot, String channel) {
-		content = new ArrayList<String>();
+		content = new LinkedList<String>();
 		this.bot = bot;
 		this.channel = channel;
 		onSwitch = false;
-		interval = 3600000;
+		interval = 3600000L;
 	}
 
-	public void setInterval(int set) {
+	public void setInterval(long set) {
 		interval = set;
 	}
 
 	public void purgeContent() {
-		content = new ArrayList<String>();
+		content = new LinkedList<String>();
 	}
 
 	public void addContent(String s) {
 		content.add(s);
 	}
 
-	public ArrayList<String> getContent() {
+	public LinkedList<String> getContent() {
 		return content;
 	}
 
@@ -41,6 +41,15 @@ public class AnnouncementEngine implements Runnable {
 		onSwitch = false;
 	}
 
+	public String removeContent(int i) {
+		if (i <= content.size() || i < 0){
+			return content.remove(i);
+		} else {
+			return null;
+		}
+	}
+	
+	
 	public void run() {
 		while (true) {
 			try {
