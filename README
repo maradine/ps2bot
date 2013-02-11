@@ -14,4 +14,7 @@ http://code.google.com/p/pircbotx/
 You will need the Google GSON library to run PS2Bot.
 http://code.google.com/p/google-gson/
 
+You will need the jsoup library to run PS2Bot.
+http://www.jsoup.org/
+
 Place both of these jars in the execution directory.
