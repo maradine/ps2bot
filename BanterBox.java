@@ -32,6 +32,8 @@ public class BanterBox extends ListenerAdapter {
 		outputSnark.add("I AM NOT MARVINBOT YOU PIKEY TWAT");
 		outputSnark.add("I should kick you for that.");
 		outputSnark.add("Go away.");
+		outputSnark.add("(╯°□°）╯︵ ┻━┻");
+		outputSnark.add("(ノಠ益ಠ)ノ彡┻━┻");
 
 		rand = new Random();
 	}

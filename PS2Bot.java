@@ -50,7 +50,6 @@ public class PS2Bot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new BanterBox());
 		bot.getListenerManager().addListener(new PlayTracker());
 		bot.getListenerManager().addListener(new TZTest());
-		
 
 
 		//execute
@@ -72,6 +71,13 @@ public class PS2Bot extends ListenerAdapter {
 		//link announcement handler
 		bot.getListenerManager().addListener(new AnnouncementHandler(ae, at));
 
+		//set up presence engine
+		PresenceEngine pe = new PresenceEngine(bot, channel);
+		Thread pt = new Thread(pe, "pt");
+		pt.start();
+
+		//link presence handler
+		bot.getListenerManager().addListener(new PresenceHandler(pe, pt));
 
 
 	}
