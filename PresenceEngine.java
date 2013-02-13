@@ -2,6 +2,7 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import org.pircbotx.PircBotX;
 import org.pircbotx.Colors;
+import java.io.IOException;
 
 public class PresenceEngine implements Runnable {
 
@@ -10,6 +11,7 @@ public class PresenceEngine implements Runnable {
 	private String channel;
 	private boolean onSwitch;
 	private long interval;
+	private int timeout;
 
 	public PresenceEngine(PircBotX bot, String channel) {
 		presence = new HashMap<String,Boolean>();
@@ -17,10 +19,19 @@ public class PresenceEngine implements Runnable {
 		this.channel = channel;
 		onSwitch = false;
 		interval = 360000L;
+		timeout = 5000;
 	}
 
 	public void setInterval(long set) {
 		interval = set;
+	}
+
+	public void setTimeout(int set) {
+		timeout = set;
+	}
+	
+	public int getTimeout() {
+		return timeout;
 	}
 
 	public void turnOn() {
@@ -38,7 +49,7 @@ public class PresenceEngine implements Runnable {
 				if (onSwitch) {
 				
 					// go and get new data from source
-					HashMap<String,Boolean> newpresence = GhettoPresenceChecker.getPresence();
+					HashMap<String,Boolean> newpresence = GhettoPresenceChecker.getPresence(timeout);
 					LinkedList<String> wentonline = new LinkedList<String>();
 					LinkedList<String> wentoffline = new LinkedList<String>();
 					
@@ -70,8 +81,10 @@ public class PresenceEngine implements Runnable {
 					presence = newpresence;
 				}
 
-			} catch (Exception e) {
+			} catch (InterruptedException e) {
 				bot.sendMessage(channel, "Interval timer interrupted - restarting clock.");
+			} catch (IOException e) {
+				bot.sendMessage(channel, "PSU just choked over an update check - sorry!");
 			}
 		}
 	}
