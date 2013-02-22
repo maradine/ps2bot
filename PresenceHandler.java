@@ -73,11 +73,11 @@ public class PresenceHandler extends ListenerAdapter {
 					break;
 					//
 					case "on": pe.turnOn();
-					event.respond("Auto-announcements turned ON.");
+					event.respond("Auto-presence turned ON.");
 					break;
 					//
 					case "off": pe.turnOff();
-					event.respond("Auto-announcements turned OFF.");
+					event.respond("Auto-presence turned OFF.");
 					break;
 					//
 					default: event.respond("I'm not sure what you asked me.  Valid commands are \"on\", \"off\", \"timeout\", and \"interval\".");
