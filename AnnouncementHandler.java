@@ -18,6 +18,7 @@ public class AnnouncementHandler extends ListenerAdapter {
 		this.ae = ae;
 		this.aeThread = aeThread;
 		this.pm = PermissionsManager.getInstance(); 
+		System.out.println("AnnouncementHandler initialized.");
 	}
 			
 	public void onMessage(MessageEvent event) {

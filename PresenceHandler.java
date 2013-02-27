@@ -20,10 +20,8 @@ public class PresenceHandler extends ListenerAdapter {
 		this.pe = pe;
 		this.peThread = peThread;
 		this.pm = PermissionsManager.getInstance();
+		System.out.println("PresenceHandler Initialized.");
 	}
-
-
-
 
 	public void onMessage(MessageEvent event) {
 		String rawcommand = event.getMessage();
@@ -60,14 +58,28 @@ public class PresenceHandler extends ListenerAdapter {
 					//
 					//
 					case "timeout": if (!scanner.hasNextInt()){
-						event.respond("Setting the timeout requires a number, expressed in seconds.  Max 10.");
+						event.respond("Setting the timeout requires a number, expressed in seconds.  Max 20.");
 					} else {
 						int rawint = scanner.nextInt();
-						if (rawint > 10) {
-							event.respond("Setting the timeout requires a number, expressed in seconds.  Max 10.");
+						if (rawint > 20) {
+							event.respond("Setting the timeout requires a number, expressed in seconds.  Max 20.");
 						} else {
 							event.respond("Timeout set to "+rawint+" seconds.");
 							pe.setTimeout(rawint*1000);
+						}
+					}
+					break;
+					//
+					//
+					case "outfit": if (!scanner.hasNext()){
+						event.respond("Setting the outfit requires an outfit alias, such as \"FKPK\".");
+					} else {
+						String outfit = scanner.next();
+						if (outfit.length() > 4) {
+							event.respond("Outfit aliases tend to be four characters or less.");
+						} else {
+							event.respond("Outfit set to "+outfit+".");
+							pe.setOutfit(outfit);
 						}
 					}
 					break;
@@ -93,18 +105,11 @@ public class PresenceHandler extends ListenerAdapter {
 		
 		if (command.equals("!presence")) {
 			
-		//	User user = event.getUser();
-		//	if (!pm.isAllowed("!announcements",user.getNick())) {
-		//	if (!pm.isAllowed("!presence",event.getUser(),event.getChannel())) {
-		//		event.respond("QUIT SPAMMING MY SHIT.");
-		//		return;
-		//	}
-			
 			HashMap<String,Boolean> hm = null;
 			try {
-				hm = GhettoPresenceChecker.getPresence(pe.getTimeout());
+				hm = PresenceChecker.getPresence(pe.getOutfit(), pe.getTimeout());
 			} catch (Exception e) {
-				event.respond("Something real bad wrong happened when I checked in with PSU.  So, no.");
+				event.respond("Something real bad wrong happened when I checked in with SOE.  So, no.");
 				return;
 			}
 			

@@ -12,6 +12,7 @@ public class PresenceEngine implements Runnable {
 	private boolean onSwitch;
 	private long interval;
 	private int timeout;
+	private String outfitalias;	
 
 	public PresenceEngine(PircBotX bot, String channel) {
 		presence = new HashMap<String,Boolean>();
@@ -19,7 +20,8 @@ public class PresenceEngine implements Runnable {
 		this.channel = channel;
 		onSwitch = false;
 		interval = 360000L;
-		timeout = 5000;
+		timeout = 10000;
+		outfitalias = "fkpk";
 	}
 
 	public void setInterval(long set) {
@@ -38,6 +40,14 @@ public class PresenceEngine implements Runnable {
 		onSwitch = true;
 	}
 
+	public String getOutfit() {
+		return outfitalias;
+	}
+
+	public void setOutfit(String set){
+		this.outfitalias=set;
+	}
+
 	public void turnOff() {
 		onSwitch = false;
 	}
@@ -49,7 +59,7 @@ public class PresenceEngine implements Runnable {
 				if (onSwitch) {
 				
 					// go and get new data from source
-					HashMap<String,Boolean> newpresence = GhettoPresenceChecker.getPresence(timeout);
+					HashMap<String,Boolean> newpresence = PresenceChecker.getPresence(outfitalias, timeout);
 					LinkedList<String> wentonline = new LinkedList<String>();
 					LinkedList<String> wentoffline = new LinkedList<String>();
 					
