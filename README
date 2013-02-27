@@ -1,6 +1,6 @@
 PS2Bot is an IRC bot that manages a channel full of Planetside 2 players.
 Presumably, these players are all in the same outfit, and want to know
-what each other are doing, wand when a game session is running.  The leader
+what each other are doing, and when a game session is running.  The leader
 of the outfit may want to present information from time to time, and PS2Bot
 will happily announce these things on a recurring basis.
 
@@ -10,9 +10,6 @@ simple, well-documented, and actively developed.
 
 You will need the PircBotX jar file to run PS2Bot.
 http://code.google.com/p/pircbotx/
-
-You will need the Google GSON library to run PS2Bot.
-http://code.google.com/p/google-gson/
 
 You will need the jsoup library to run PS2Bot.
 http://www.jsoup.org/
