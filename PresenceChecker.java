@@ -14,8 +14,11 @@ public class PresenceChecker {
 		
 		Document doc = null;
 		Connection con = null;
+		HashMap<String,Boolean> hm = new HashMap<String,Boolean>();
+
+
 		try {
-			con = Jsoup.connect("http://census.soe.com/xml/get/ps2-beta/outfit/?alias="+outfitalias+"&c:resolve=member_character(character_id)");
+			con = Jsoup.connect("http://census.soe.com/xml/get/ps2-beta/outfit/?alias="+outfitalias+"&c:resolve=member_character(id,name),member_online_status");
 			con.timeout(timeout);
 			con.parser(Parser.xmlParser());
 			doc = con.get();
@@ -24,46 +27,19 @@ public class PresenceChecker {
 			System.out.println(ioe);
 			throw ioe;
 		}
-		Elements idelements = doc.select("outfit_list > outfit > members_list > members[id]"); 			
 
-		LinkedList<String> idlist = new LinkedList<String>();
-		LinkedList<String> namelist = new LinkedList<String>();
-		LinkedList<Boolean> statuslist = new LinkedList<Boolean>();
+		Elements nameelements = doc.select("outfit_list > outfit > members_list > members[id] > name"); 			
+		Elements statuselements = doc.select("outfit_list > outfit > members_list > members[id]");
+		int size = nameelements.size();
 
-		for (Element el : idelements) {
-			String id = el.attr("id");
-			idlist.add(id);
-		}
-
-		for (String id : idlist) {
-
-			System.out.println("iterating over "+id);
-			try {
-				con = Jsoup.connect("http://census.soe.com/xml/get/ps2-beta/character/?id="+id+"&c:resolve=online_status&c:show=name");
-				con.timeout(timeout);
-				con.parser(Parser.xmlParser());
-				doc = con.get();
-			} catch (IOException ioe) {
-				System.out.println("***connection error to SOE***");
-				System.out.println(ioe);
-				throw ioe;
+		for (int i=0;i<size;i++) {
+			String name = nameelements.get(i).attr("first_lower");
+			String statusstring = statuselements.get(i).attr("online_status");
+			Boolean status = false;
+			if (!statusstring.equals("0")) {
+				status = true;
 			}
-			Element el = doc.select("character_list > character > name").first();
-			String name = el.attr("first_lower");
-			namelist.add(name);
-			el = doc.select("character_list > character").first();
-			String status = el.attr("online_status");
-			if (status.equals("2")) {
-				statuslist.add(true);
-			} else {
-				statuslist.add(false);
-			}
-		
-		}
-
-		HashMap<String,Boolean> hm = new HashMap<String,Boolean>();
-		for (int i = 0; i < idlist.size(); i++) {
-			hm.put(namelist.get(i), statuslist.get(i));
+			hm.put(name,status);
 		}
 
 		return hm;

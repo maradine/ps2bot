@@ -28,6 +28,7 @@ public class PS2Bot extends ListenerAdapter {
 				props.setProperty("channel", "#planetside2");
 				props.setProperty("botnick", "ps2bot");
 				props.setProperty("nickpass", "");
+				props.setProperty("ownernick", "");
 
 				props.store(new FileOutputStream("ps2bot.properties"), null);
 			} catch (IOException ioe2) {
@@ -44,13 +45,15 @@ public class PS2Bot extends ListenerAdapter {
 		String server = props.getProperty("server");
 		String channel = props.getProperty("channel");
 		String botnick = props.getProperty("botnick");
+		String ownernick = props.getProperty("ownernick");
 		
-		//add listeners
-		//bot.getListenerManager().addListener(new JoinDetector());
+		
+		//seed the permissions manager
+		PermissionsManager pm = PermissionsManager.initInstance(ownernick);
+		
+		//add misc listeners
 		bot.getListenerManager().addListener(new BanterBox());
-		bot.getListenerManager().addListener(new PlayTracker());
-		bot.getListenerManager().addListener(new TZTest());
-
+		bot.getListenerManager().addListener(new PermissionsHandler());
 
 		//execute
 		bot.setVerbose(true);

@@ -5,32 +5,45 @@ import java.util.Set;
 public class PermissionsManager {
 
 	private static PermissionsManager instance;
+	private static Boolean locked;
+	private static String owner;
 
-	private PermissionsManager() {
+	private PermissionsManager(String setowner) {
+		locked = true;
+		this.owner = setowner;
 	}
 
-	public static synchronized PermissionsManager getInstance() {
-		if (instance==null) {
-			instance = new PermissionsManager();
-		}
+	public static synchronized PermissionsManager initInstance(String owner) {
+		instance = new PermissionsManager(owner);
 		return instance;
 	}
 
-	public static boolean isAllowed(String command, String nick) {
-		if (nick.equals("maradine")) {
-			return true;
-		} else {
-			return false;
-		}
+	public static synchronized PermissionsManager getInstance() {
+		return instance;
+	}
+
+	public static void lock() {
+		locked = true;
+	}
+
+	public static void unlock() {
+		locked = false;
 	}
 
 	public static boolean isAllowed(String command, User user, Channel channel) {
-		Set<Channel> channels = user.getChannelsOpIn();
-		if (channels.contains(channel)) {
-			return true;
-		} else {
-			return false;
+
+		// not currently doing any command checking
+		Boolean isallowed = false;
+		if (user.getNick().equals(owner)) {
+			isallowed = true;
 		}
+		if (!locked) {
+			Set<Channel> channels = user.getChannelsOpIn();
+			if (channels.contains(channel)) {
+				isallowed = true;
+			}
+		}
+		return isallowed;
 	}
 	
 }
