@@ -29,6 +29,7 @@ public class PS2Bot extends ListenerAdapter {
 				props.setProperty("botnick", "ps2bot");
 				props.setProperty("nickpass", "");
 				props.setProperty("ownernick", "");
+				props.setProperty("channelpass", "");
 
 				props.store(new FileOutputStream("ps2bot.properties"), null);
 			} catch (IOException ioe2) {
@@ -47,7 +48,6 @@ public class PS2Bot extends ListenerAdapter {
 		String botnick = props.getProperty("botnick");
 		String ownernick = props.getProperty("ownernick");
 		
-		
 		//seed the permissions manager
 		PermissionsManager pm = PermissionsManager.initInstance(ownernick);
 		
@@ -55,17 +55,33 @@ public class PS2Bot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new BanterBox());
 		bot.getListenerManager().addListener(new PermissionsHandler());
 
-		//execute
+		//connect
 		bot.setVerbose(true);
 		bot.setName(botnick);
 		bot.connect(server);
-		bot.joinChannel(channel);
 		
-		String pass = props.getProperty("nickpass");
-		if (pass != null) {
-			bot.identify(pass);
+		//identify with nickserv if so enabled
+		String nickpass = props.getProperty("nickpass");
+		if (nickpass != null) {
+			bot.identify(nickpass);
 		}
 
+		//join channel, passing key if needed
+		String channelpass = props.getProperty("channelpass");
+		if (channelpass==null || channelpass.equals("")) {
+			bot.joinChannel(channel);
+		} else {
+			bot.joinChannel(channel, channelpass);
+		}
+		
+		//pause to let channel join complete.  If we failed, exit.	
+		Thread.sleep(5000);
+		if (!bot.channelExists(channel)) {
+			System.out.println("*** Bot failed to connect to channel \""+channel+"\".  Either the key is wrong, or the server is experiencing unusual load.");
+			bot.shutdown(true);
+		}
+
+		
 		//set up announcement engine
 		AnnouncementEngine ae = new AnnouncementEngine(bot, channel);
 		Thread at = new Thread(ae, "at");
