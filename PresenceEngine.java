@@ -12,12 +12,14 @@ public class PresenceEngine implements Runnable {
 	private boolean onSwitch;
 	private long interval;
 	private int timeout;
-	private String outfitalias;	
+	private String outfitalias;
+	private String soeapikey;	
 
-	public PresenceEngine(PircBotX bot, String channel) {
+	public PresenceEngine(PircBotX bot, String channel, String soeapikey) {
 		presence = new HashMap<String,Boolean>();
 		this.bot = bot;
 		this.channel = channel;
+		this.soeapikey = soeapikey;
 		onSwitch = false;
 		interval = 360000L;
 		timeout = 10000;
@@ -59,7 +61,7 @@ public class PresenceEngine implements Runnable {
 				if (onSwitch) {
 				
 					// go and get new data from source
-					HashMap<String,Boolean> newpresence = PresenceChecker.getPresence(outfitalias, timeout);
+					HashMap<String,Boolean> newpresence = PresenceChecker.getPresence(outfitalias, timeout, soeapikey);
 					LinkedList<String> wentonline = new LinkedList<String>();
 					LinkedList<String> wentoffline = new LinkedList<String>();
 					

@@ -13,13 +13,14 @@ public class PresenceHandler extends ListenerAdapter {
 	private Scanner scanner;
 	private PresenceEngine pe;
 	private Thread peThread;
+	private String soeapikey;
 
-
-	public PresenceHandler(PresenceEngine pe, Thread peThread) {
+	public PresenceHandler(PresenceEngine pe, Thread peThread, String soeapikey) {
 		super();
 		this.pe = pe;
 		this.peThread = peThread;
 		this.pm = PermissionsManager.getInstance();
+		this.soeapikey = soeapikey;
 		System.out.println("PresenceHandler Initialized.");
 	}
 
@@ -107,7 +108,7 @@ public class PresenceHandler extends ListenerAdapter {
 			
 			HashMap<String,Boolean> hm = null;
 			try {
-				hm = PresenceChecker.getPresence(pe.getOutfit(), pe.getTimeout());
+				hm = PresenceChecker.getPresence(pe.getOutfit(), pe.getTimeout(), soeapikey);
 			} catch (Exception e) {
 				event.respond("Something real bad wrong happened when I checked in with SOE.  So, no.");
 				return;

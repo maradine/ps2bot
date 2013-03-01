@@ -30,6 +30,7 @@ public class PS2Bot extends ListenerAdapter {
 				props.setProperty("nickpass", "");
 				props.setProperty("ownernick", "");
 				props.setProperty("channelpass", "");
+				props.setProperty("soeapikey", "");
 
 				props.store(new FileOutputStream("ps2bot.properties"), null);
 			} catch (IOException ioe2) {
@@ -91,12 +92,13 @@ public class PS2Bot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new AnnouncementHandler(ae, at));
 
 		//set up presence engine
-		PresenceEngine pe = new PresenceEngine(bot, channel);
+		String soeapikey = props.getProperty("soeapikey");
+		PresenceEngine pe = new PresenceEngine(bot, channel, soeapikey);
 		Thread pt = new Thread(pe, "pt");
 		pt.start();
 
 		//link presence handler
-		bot.getListenerManager().addListener(new PresenceHandler(pe, pt));
+		bot.getListenerManager().addListener(new PresenceHandler(pe, pt, soeapikey));
 
 
 	}
