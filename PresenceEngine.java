@@ -11,6 +11,7 @@ public class PresenceEngine implements Runnable {
 	private String channel;
 	private boolean onSwitch;
 	private long interval;
+	private long backoff;
 	private int timeout;
 	private String outfitalias;
 	private String soeapikey;	
@@ -21,7 +22,8 @@ public class PresenceEngine implements Runnable {
 		this.channel = channel;
 		this.soeapikey = soeapikey;
 		onSwitch = false;
-		interval = 360000L;
+		interval = 300000L;
+		backoff = 0L;
 		timeout = 10000;
 		outfitalias = "fkpk";
 	}
@@ -57,7 +59,7 @@ public class PresenceEngine implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-				Thread.sleep(interval);
+				Thread.sleep(interval+backoff);
 				if (onSwitch) {
 				
 					// go and get new data from source
@@ -91,12 +93,27 @@ public class PresenceEngine implements Runnable {
 						bot.sendMessage(channel, s+" is now "+Colors.RED+"offline.");
 					}
 					presence = newpresence;
+					backoff = 0L;
 				}
 
 			} catch (InterruptedException e) {
-				bot.sendMessage(channel, "Interval timer interrupted - restarting clock.");
+				bot.sendMessage(channel, "Interval timer interrupted - resetting backoff and restarting clock.");
 			} catch (IOException e) {
-				bot.sendMessage(channel, "PSU just choked over an update check - sorry!");
+				if (backoff==0L) {
+					backoff = 300000L;
+					bot.sendMessage(channel, "SOE just choked over an update check - sorry!  Backing off a bit.");
+					System.out.println("API Failure - backoff is now "+backoff);
+				} else if (backoff > 3600000L) {
+					bot.sendMessage(channel, "Enough API calls have failed that I'm shutting down the presence engine.  Please contact my owner.");
+					System.out.println("API Failure");
+					System.out.println("Shutting down presence and resetting timeouts.");
+					this.turnOff();
+					backoff=0L;
+				} else {
+					backoff = backoff*2;
+					bot.sendMessage(channel, "SOE choked again.  Backing off further.");
+					System.out.println("API Failure - backoff is now "+backoff);
+				}
 			}
 		}
 	}

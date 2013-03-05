@@ -97,12 +97,8 @@ public class PresenceHandler extends ListenerAdapter {
 					break;
 
 				}
-			
-			
 			}
 		}
-			
-		
 		
 		if (command.equals("!presence")) {
 			
@@ -115,15 +111,19 @@ public class PresenceHandler extends ListenerAdapter {
 			}
 			
 			String onlinenames = "";
+			int count = 0;
 			for (String key : hm.keySet()) {
 				if (hm.get(key)) {
 					//System.out.println("concat'ing key: "+key);
 					onlinenames=onlinenames.concat(key+" ");
+					count++;
 					//System.out.println("onlinenames is now "+onlinenames);
 				}
 			}
 			if (onlinenames.equals("")) {
 				event.respond("No one is online.  Not a sausage.");
+			} else if (count > 20) {
+				event.respond("There are "+count+" players online.  I shant bore you with the details.");
 			} else {
 				event.respond(onlinenames + Colors.GREEN +"online");
 			}
