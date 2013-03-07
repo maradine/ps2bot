@@ -101,6 +101,8 @@ public class PS2Bot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new PresenceHandler(pe, pt, soeapikey));
 
 
+		//link general command handler
+		bot.getListenerManager().addListener(new GeneralHandler(bot));
 	}
 }
 
