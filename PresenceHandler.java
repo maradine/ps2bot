@@ -123,7 +123,7 @@ public class PresenceHandler extends ListenerAdapter {
 			if (onlinenames.equals("")) {
 				event.respond("No one is online.  Not a sausage.");
 			} else if (count > 20) {
-				event.respond("There are "+count+" players online.  I shant bore you with the details.");
+				event.respond("There are "+count+" players online.  I shan't bore you with the details.");
 			} else {
 				event.respond(onlinenames + Colors.GREEN +"online");
 			}
