@@ -22,7 +22,7 @@ public class PresenceEngine implements Runnable {
 		this.channel = channel;
 		this.soeapikey = soeapikey;
 		onSwitch = false;
-		interval = 300000L;
+		interval = 60000L;
 		backoff = 0L;
 		timeout = 10000;
 		outfitalias = "fkpk";
