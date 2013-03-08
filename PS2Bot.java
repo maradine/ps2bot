@@ -64,7 +64,9 @@ public class PS2Bot extends ListenerAdapter {
 		//identify with nickserv if so enabled
 		String nickpass = props.getProperty("nickpass");
 		if (nickpass != null) {
+                    if (!nickpass.isEmpty()) {
 			bot.identify(nickpass);
+                    }
 		}
 
 		//join channel, passing key if needed
