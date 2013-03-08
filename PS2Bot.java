@@ -103,6 +103,7 @@ public class PS2Bot extends ListenerAdapter {
 
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));
+		bot.getListenerManager().addListener(new SpeechHandler(bot,channel));
 	}
 }
 
