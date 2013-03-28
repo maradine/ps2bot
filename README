@@ -17,6 +17,8 @@ http://www.jsoup.org/
 
 INSTRUCTIONS
 
+0.  You need a Java 7 JDK/JRE to rock this.
+
 1.  Acquire the source tree.  You can do this in a number of ways from the project site.
   If you already have git installed, you can "git clone https://github.com/maradine/ps2bot.git"
   into a fresh directory.
