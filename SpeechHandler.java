@@ -70,6 +70,28 @@ public class SpeechHandler extends ListenerAdapter {
 				}
 			} 
 		}
+		if (command.startsWith("!ban ")) {
+			User user = event.getUser();
+			Channel channelobject = bot.getChannel(channel);
+			//check permissions
+			if (!pm.isAllowed("!ban",event.getUser(),channelobject)) {
+				event.respond("Sorry, you are not authorized to run this command.");
+				return;
+			}
+			scanner = new Scanner(command);
+			String token = scanner.next(); //token is "!ban"
+			
+			if (scanner.hasNext()){
+				String targetnick = scanner.next(); //token should be target nick
+				String hostmask = bot.getUser(targetnick).getHostmask();
+				String realname = bot.getUser(targetnick).getRealName();
+				String login = bot.getUser(targetnick).getLogin();
+				String banmask = "*!"+login+"@"+hostmask;
+				event.respond(targetnick + " " + login + " " + realname + " " + hostmask);
+				event.respond(banmask);
+
+			} 
+		}
 
 	}
 }

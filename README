@@ -29,7 +29,7 @@ INSTRUCTIONS
 4.  Run the bot with:
   "java -cp jsoup-1.7.2.jar:pircbotx-1.9dev.jar:. PS2Bot"
 
-5.  Momdify the automatically generated properties file with your desired IRC server and nick.
+5.  Modify the automatically generated properties file with your desired IRC server and nick.
 
 6.  Run again and enjoy life.
 
