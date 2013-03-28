@@ -25,7 +25,6 @@ public class SpeechHandler extends ListenerAdapter {
 			
 	public void onPrivateMessage(PrivateMessageEvent event) {
 		
-		System.out.println("I got a private message!");
 		String rawcommand = event.getMessage();
 		String command = rawcommand.toLowerCase();
 		
@@ -37,7 +36,7 @@ public class SpeechHandler extends ListenerAdapter {
 				event.respond("Sorry, you are not authorized to run this command.");
 				return;
 			}
-			scanner = new Scanner(rawcommand);
+			scanner = new Scanner(command);
 			String token = scanner.next();
 			
 			if (scanner.hasNext()){
@@ -45,6 +44,31 @@ public class SpeechHandler extends ListenerAdapter {
 				String newmessage = rawcommand.substring(7);
 				bot.sendMessage(channel, newmessage);
 			}
+		}
+		if (command.startsWith("!kick ")) {
+			User user = event.getUser();
+			Channel channelobject = bot.getChannel(channel);
+			//check permissions
+			if (!pm.isAllowed("!kick",event.getUser(),channelobject)) {
+				event.respond("Sorry, you are not authorized to run this command.");
+				return;
+			}
+			scanner = new Scanner(command);
+			String token = scanner.next(); //token is "!kick"
+			
+			if (scanner.hasNext()){
+				String targetnick = scanner.next(); //token should be target nick
+				int nicklength = targetnick.length();
+				if (scanner.hasNext()) {
+					// there was a reason tacked on, too
+					String reason = rawcommand.substring(7+nicklength);
+					bot.kick(bot.getChannel(channel),bot.getUser(targetnick),reason);
+					return;
+				} else {
+					bot.kick(bot.getChannel(channel),bot.getUser(targetnick));
+					return;
+				}
+			} 
 		}
 
 	}
