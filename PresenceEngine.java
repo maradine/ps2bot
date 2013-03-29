@@ -15,13 +15,15 @@ public class PresenceEngine implements Runnable {
 	private int timeout;
 	private String outfitalias;
 	private String soeapikey;	
-
+	private boolean squelch;
+	
 	public PresenceEngine(PircBotX bot, String channel, String soeapikey) {
 		presence = new HashMap<String,Boolean>();
 		this.bot = bot;
 		this.channel = channel;
 		this.soeapikey = soeapikey;
 		onSwitch = false;
+		squelch = true;
 		interval = 60000L;
 		backoff = 0L;
 		timeout = 10000;
@@ -42,6 +44,14 @@ public class PresenceEngine implements Runnable {
 
 	public void turnOn() {
 		onSwitch = true;
+	}
+
+	public void squelchOn() {
+		squelch = true;
+	}
+
+	public void squelchOff() {
+		squelch = false;
 	}
 
 	public String getOutfit() {
@@ -86,13 +96,31 @@ public class PresenceEngine implements Runnable {
 							}
 						}
 					}
-					for (String s : wentonline) {
-						bot.sendMessage(channel, s+" is now "+Colors.GREEN+"online.");
+					
+
+					//squelch output if the change is unrealistically large (SOE patch time)
+					int totalSize = newpresence.size();
+					int onlineDiff = wentonline.size();
+					int offlineDiff = wentoffline.size();
+					
+					float percentChangeOnline = (float)onlineDiff / (float)totalSize; 
+					float percentChangeOffline = (float)offlineDiff / (float)totalSize; 
+					
+					boolean squelchTrigger = false;
+
+					if (percentChangeOnline > .9 || percentChangeOffline > .9) {
+						squelchTrigger = true;
 					}
-					for (String s : wentoffline) {
-						bot.sendMessage(channel, s+" is now "+Colors.RED+"offline.");
+
+					if (!squelchTrigger) {
+						for (String s : wentonline) {
+							bot.sendMessage(channel, s+" is now "+Colors.GREEN+"online.");
+						}
+						for (String s : wentoffline) {
+							bot.sendMessage(channel, s+" is now "+Colors.RED+"offline.");
+						}
+						presence = newpresence;
 					}
-					presence = newpresence;
 					backoff = 0L;
 				}
 

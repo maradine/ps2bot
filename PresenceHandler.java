@@ -85,6 +85,22 @@ public class PresenceHandler extends ListenerAdapter {
 					}
 					break;
 					//
+					case "squelch": if (!scanner.hasNext()){
+						event.respond("On or off?");
+					} else {
+						String onoff = scanner.next();
+						if (!onoff.equals("on") && !onoff.equals("off")) {
+							event.respond("On or off?");
+						} else if (onoff.equals("on")){
+							event.respond("Turning on squelch.");
+							pe.squelchOn();
+						} else if (onoff.equals("off")){
+							event.respond("Turning off squelch.");
+							pe.squelchOff();
+						}
+					}
+					break;
+					//
 					case "on": pe.turnOn();
 					event.respond("Auto-presence turned ON.");
 					break;
