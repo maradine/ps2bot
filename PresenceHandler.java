@@ -30,8 +30,6 @@ public class PresenceHandler extends ListenerAdapter {
 		
 		if (command.startsWith("!presence ")) {
 			User user = event.getUser();
-			//check permissions
-			//if (!pm.isAllowed("!announcements",user.getNick())) {
 			if (!pm.isAllowed("!presence",event.getUser(),event.getChannel())) {
 				event.respond("Sorry, you are not in the access list for presence checking.");
 				return;
@@ -73,15 +71,20 @@ public class PresenceHandler extends ListenerAdapter {
 					//
 					//
 					case "outfit": if (!scanner.hasNext()){
-						event.respond("Setting the outfit requires an outfit alias, such as \"FKPK\".");
+						event.respond("'add' [outfitalias] or 'purge'.");
 					} else {
-						String outfit = scanner.next();
-						if (outfit.length() > 4) {
-							event.respond("Outfit aliases tend to be four characters or less.");
+						String outfitCommand = scanner.next();
+						if (outfitCommand.equals("purge")) {
+							pe.purgeOutfits();
+							event.respond("Outfit list purged.");
+						} else if (outfitCommand.equals("add")) {
+							String addme = rawcommand.substring(21);
+							event.respond("I added '"+addme+"' to the auto-presence API pull.  Note that those are case sensitive.");
+							pe.addOutfit(addme);
 						} else {
-							event.respond("Outfit set to "+outfit+".");
-							pe.setOutfit(outfit);
+							event.respond("I am so high right now . . .");
 						}
+
 					}
 					break;
 					//
@@ -120,7 +123,7 @@ public class PresenceHandler extends ListenerAdapter {
 			
 			HashMap<String,Boolean> hm = null;
 			try {
-				hm = PresenceChecker.getPresence(pe.getOutfit(), pe.getTimeout(), soeapikey);
+				hm = PresenceChecker.getPresence(pe.getOutfits().get(0), pe.getTimeout(), soeapikey);
 			} catch (Exception e) {
 				event.respond("Something real bad wrong happened when I checked in with SOE.  So, no.");
 				return;
