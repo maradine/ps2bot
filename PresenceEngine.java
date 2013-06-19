@@ -19,6 +19,7 @@ public class PresenceEngine implements Runnable {
 	private boolean squelch;
 	
 	public PresenceEngine(PircBotX bot, String channel, String soeapikey) {
+		allPresenceStates = new HashMap<String, HashMap<String,Boolean>>();
 		presenceState = new HashMap<String,Boolean>();
 		this.bot = bot;
 		this.channel = channel;
