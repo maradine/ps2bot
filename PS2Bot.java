@@ -90,6 +90,9 @@ public class PS2Bot extends ListenerAdapter {
 		Thread at = new Thread(ae, "at");
 		at.start();
 
+		//set up twitter listener
+		bot.getListenerManager().addListener(new TwitterListener(bot, channel, props));
+		
 		//link announcement handler
 		bot.getListenerManager().addListener(new AnnouncementHandler(ae, at));
 
@@ -106,6 +109,7 @@ public class PS2Bot extends ListenerAdapter {
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));
 		bot.getListenerManager().addListener(new SpeechHandler(bot,channel));
+		
 	}
 }
 
