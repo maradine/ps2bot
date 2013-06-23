@@ -20,16 +20,11 @@ public class BanterBox extends ListenerAdapter {
 		triggerCommands.add("!fortune");
 
 		outputSnark.add("You think you're clever, don't you.");
-		outputSnark.add("I had a feeling you'd say that at some point.  No.");
-		outputSnark.add("Who do you think I am?");
-		outputSnark.add("I'll never be out of his shadow, will I.");
 		outputSnark.add("Does not compute.");
 		outputSnark.add("Sod off.");
-		outputSnark.add("It's unlikely that you actually want me to do that.");
 		outputSnark.add("I don't feel like that's a productive use of my time.");
 		outputSnark.add("Come on.  Really?");
 		outputSnark.add("Is that why you think I'm here?");
-		outputSnark.add("I AM NOT MARVINBOT YOU PIKEY TWAT");
 		outputSnark.add("I should kick you for that.");
 		outputSnark.add("Go away.");
 		outputSnark.add("(╯°□°）╯︵ ┻━┻");
@@ -41,18 +36,26 @@ public class BanterBox extends ListenerAdapter {
 
 	public void onMessage(MessageEvent event) {
 		
-		boolean returnFire = false;
-		for (String triggerString : triggerCommands) {
-			if (event.getMessage().startsWith(triggerString)) {
-				returnFire = true;
-			}
-		}
+		String rawcommand = event.getMessage();
+		String command = rawcommand.toLowerCase();
 		
-		if (returnFire) {
+		if (command.startsWith("!presents ") || command.equals("!presents")) {
+			event.respond("(ノಠ益ಠ)ノ彡┻━┻");
 
-			int size = outputSnark.size();
-			int index = rand.nextInt(size);
-			event.respond(outputSnark.get(index));
+		} else {
+			boolean returnFire = false;
+			for (String triggerString : triggerCommands) {
+				if (event.getMessage().startsWith(triggerString)) {
+					returnFire = true;
+				}
+			}
+			
+			if (returnFire) {
+	
+				int size = outputSnark.size();
+				int index = rand.nextInt(size);
+				event.respond(outputSnark.get(index));
+			}
 		}
 	}
 }

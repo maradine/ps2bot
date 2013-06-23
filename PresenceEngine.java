@@ -6,19 +6,21 @@ import java.io.IOException;
 
 public class PresenceEngine implements Runnable {
 
-	private HashMap<String,Boolean> presence;
+	private HashMap<String,HashMap<String,Boolean>> allPresenceStates;
+	private HashMap<String,Boolean> presenceState;
 	private PircBotX bot;
 	private String channel;
 	private boolean onSwitch;
 	private long interval;
 	private long backoff;
 	private int timeout;
-	private String outfitalias;
+	private LinkedList<String> outfitAliasList;
 	private String soeapikey;	
 	private boolean squelch;
 	
 	public PresenceEngine(PircBotX bot, String channel, String soeapikey) {
-		presence = new HashMap<String,Boolean>();
+		allPresenceStates = new HashMap<String, HashMap<String,Boolean>>();
+		presenceState = new HashMap<String,Boolean>();
 		this.bot = bot;
 		this.channel = channel;
 		this.soeapikey = soeapikey;
@@ -27,7 +29,8 @@ public class PresenceEngine implements Runnable {
 		interval = 60000L;
 		backoff = 0L;
 		timeout = 10000;
-		outfitalias = "fkpk";
+		outfitAliasList = new LinkedList<String>();
+		outfitAliasList.add("FKPK");
 	}
 
 	public void setInterval(long set) {
@@ -54,12 +57,17 @@ public class PresenceEngine implements Runnable {
 		squelch = false;
 	}
 
-	public String getOutfit() {
-		return outfitalias;
+	public LinkedList<String> getOutfits() {
+		return outfitAliasList;
 	}
 
-	public void setOutfit(String set){
-		this.outfitalias=set;
+	public void addOutfit(String set){
+		this.outfitAliasList.add(set);
+	}
+
+	public void purgeOutfits() {
+		this.outfitAliasList = new LinkedList<String>();
+		this.allPresenceStates = new HashMap<String, HashMap<String, Boolean>>();
 	}
 
 	public void turnOff() {
@@ -72,56 +80,64 @@ public class PresenceEngine implements Runnable {
 				Thread.sleep(interval+backoff);
 				if (onSwitch) {
 				
-					// go and get new data from source
-					HashMap<String,Boolean> newpresence = PresenceChecker.getPresence(outfitalias, timeout, soeapikey);
-					LinkedList<String> wentonline = new LinkedList<String>();
-					LinkedList<String> wentoffline = new LinkedList<String>();
 					
-					// compare data to current list
-					for (String name : newpresence.keySet()){
-						//bot.sendMessage(channel, "Iterating over "+name);
-						Boolean oldstatus = presence.get(name);
-						Boolean newstatus = newpresence.get(name);
-						if (oldstatus == null) {
-							if (newstatus == true) {
-								wentonline.add(name);
-							}
-						} else if (oldstatus == true) {
-							if (newstatus == false) {
-								wentoffline.add(name);
-							}
-						} else if (oldstatus == false) {
-							if (newstatus == true) {
-								wentonline.add(name);
+					for (String outfit : outfitAliasList) {
+					
+						// go and get new data from source
+						HashMap<String,Boolean> newPresenceState = PresenceChecker.getPresence(outfit, timeout, soeapikey);
+						HashMap<String,Boolean> oldPresenceState = allPresenceStates.get(outfit);
+						if (oldPresenceState == null) {
+							oldPresenceState = new HashMap<String,Boolean>();
+						}
+						LinkedList<String> wentonline = new LinkedList<String>();
+						LinkedList<String> wentoffline = new LinkedList<String>();
+					
+						// compare data to current list
+						for (String name : newPresenceState.keySet()){
+							//bot.sendMessage(channel, "Iterating over "+name);
+							Boolean oldstatus = oldPresenceState.get(name);
+							Boolean newstatus = newPresenceState.get(name);
+							if (oldstatus == null) {
+								if (newstatus == true) {
+									wentonline.add(name);
+								}
+							} else if (oldstatus == true) {
+								if (newstatus == false) {
+									wentoffline.add(name);
+								}
+							} else if (oldstatus == false) {
+								if (newstatus == true) {
+									wentonline.add(name);
+								}
 							}
 						}
-					}
 					
 
-					//squelch output if the change is unrealistically large (SOE patch time)
-					int totalSize = newpresence.size();
-					int onlineDiff = wentonline.size();
-					int offlineDiff = wentoffline.size();
+						//squelch output if the change is unrealistically large (SOE patch time)
+						int totalSize = newPresenceState.size();
+						int onlineDiff = wentonline.size();
+						int offlineDiff = wentoffline.size();
 					
-					float percentChangeOnline = (float)onlineDiff / (float)totalSize; 
-					float percentChangeOffline = (float)offlineDiff / (float)totalSize; 
-					
-					boolean squelchTrigger = false;
-
-					if (percentChangeOnline > .9 || percentChangeOffline > .9) {
-						squelchTrigger = true;
-					}
-
-					if (!squelchTrigger) {
-						for (String s : wentonline) {
-							bot.sendMessage(channel, s+" is now "+Colors.GREEN+"online.");
+						float percentChangeOnline = (float)onlineDiff / (float)totalSize; 
+						float percentChangeOffline = (float)offlineDiff / (float)totalSize; 
+						
+						boolean squelchTrigger = false;
+	
+						if (percentChangeOnline > .9 || percentChangeOffline > .9) {
+							squelchTrigger = true;
 						}
-						for (String s : wentoffline) {
-							bot.sendMessage(channel, s+" is now "+Colors.RED+"offline.");
+
+						if (!squelchTrigger) {
+							for (String s : wentonline) {
+								bot.sendMessage(channel, "["+outfit+"]"+s+" is now "+Colors.GREEN+"online.");
+							}
+							for (String s : wentoffline) {
+								bot.sendMessage(channel, "["+outfit+"]"+s+" is now "+Colors.RED+"offline.");
+							}
+							allPresenceStates.put(outfit, newPresenceState);
 						}
-						presence = newpresence;
+						backoff = 0L;
 					}
-					backoff = 0L;
 				}
 
 			} catch (InterruptedException e) {
