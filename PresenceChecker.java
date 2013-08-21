@@ -18,9 +18,9 @@ public class PresenceChecker {
 		String querystring;
 
 		if (soeapikey == null || soeapikey.equals("")) {
-			querystring = "http://census.soe.com/xml/get/ps2-beta/outfit/?alias="+outfitalias+"&c:resolve=member_character(id,name),member_online_status";
+			querystring = "http://census.soe.com/xml/get/ps2:v2/outfit/?alias="+outfitalias+"&c:resolve=member_character(id,name),member_online_status";
 		} else {
-			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2-beta/outfit/?alias="+outfitalias+"&c:resolve=member_character(id,name),member_online_status";
+			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/outfit/?alias="+outfitalias+"&c:resolve=member_character(id,name),member_online_status";
 		}
 		System.out.println("running "+ querystring);
 		try {
