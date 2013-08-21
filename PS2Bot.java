@@ -24,14 +24,19 @@ public class PS2Bot extends ListenerAdapter {
 			System.out.println("Modify this file and re-run.");
 			
 			try {
-				props.setProperty("server", "irc.slashnet.org");
-				props.setProperty("channel", "#planetside2");
+				props.setProperty("irc_server", "irc.slashnet.org");
+				props.setProperty("irc_channel", "#planetside2");
 				props.setProperty("botnick", "ps2bot");
 				props.setProperty("nickpass", "");
 				props.setProperty("ownernick", "");
 				props.setProperty("channelpass", "");
 				props.setProperty("soeapikey", "");
-
+				props.setProperty("db_server", "");
+				props.setProperty("db_port", "");
+				props.setProperty("database", "");
+				props.setProperty("db_username", "");
+				props.setProperty("db_password", "");
+		
 				props.store(new FileOutputStream("ps2bot.properties"), null);
 			} catch (IOException ioe2) {
 				System.out.println("There was an error writing to the filesystem.");
@@ -40,12 +45,12 @@ public class PS2Bot extends ListenerAdapter {
 
 		} 			
 		props.load(fis);
-		if (!props.containsKey("server") || !props.containsKey("channel") || !props.containsKey("botnick")) {
+		if (!props.containsKey("irc_server") || !props.containsKey("irc_channel") || !props.containsKey("botnick")) {
 			System.out.println("Config file is incomplete.  Delete it to receive a working template.");
 			System.exit(1);
 		}
-		String server = props.getProperty("server");
-		String channel = props.getProperty("channel");
+		String ircServer = props.getProperty("irc_server");
+		String ircChannel = props.getProperty("irc_channel");
 		String botnick = props.getProperty("botnick");
 		String ownernick = props.getProperty("ownernick");
 		
@@ -59,7 +64,7 @@ public class PS2Bot extends ListenerAdapter {
 		//connect
 		bot.setVerbose(true);
 		bot.setName(botnick);
-		bot.connect(server);
+		bot.connect(ircServer);
 		
 		//identify with nickserv if so enabled
 		String nickpass = props.getProperty("nickpass");
@@ -72,21 +77,21 @@ public class PS2Bot extends ListenerAdapter {
 		//join channel, passing key if needed
 		String channelpass = props.getProperty("channelpass");
 		if (channelpass==null || channelpass.equals("")) {
-			bot.joinChannel(channel);
+			bot.joinChannel(ircChannel);
 		} else {
-			bot.joinChannel(channel, channelpass);
+			bot.joinChannel(ircChannel, channelpass);
 		}
 		
 		//pause to let channel join complete.  If we failed, exit.	
 		Thread.sleep(5000);
-		if (!bot.channelExists(channel)) {
-			System.out.println("*** Bot failed to connect to channel \""+channel+"\".  Either the key is wrong, or the server is experiencing unusual load.");
+		if (!bot.channelExists(ircChannel)) {
+			System.out.println("*** Bot failed to connect to channel \""+ircChannel+"\".  Either the key is wrong, or the server is experiencing unusual load.");
 			bot.shutdown(true);
 		}
 
 		
 		//set up announcement engine
-		AnnouncementEngine ae = new AnnouncementEngine(bot, channel);
+		AnnouncementEngine ae = new AnnouncementEngine(bot, ircChannel);
 		Thread at = new Thread(ae, "at");
 		at.start();
 
@@ -95,19 +100,28 @@ public class PS2Bot extends ListenerAdapter {
 
 		//set up presence engine
 		String soeapikey = props.getProperty("soeapikey");
-		PresenceEngine pe = new PresenceEngine(bot, channel, soeapikey);
+		PresenceEngine pe = new PresenceEngine(bot, ircChannel, soeapikey);
 		Thread pt = new Thread(pe, "pt");
 		pt.start();
 
 		//link presence handler
 		bot.getListenerManager().addListener(new PresenceHandler(pe, pt, soeapikey));
 
+		//set up stat engine
+		StatCollectionEngine se = new StatCollectionEngine(bot, props);
+		Thread st = new Thread(se, "st");
+		st.start();
+
+		//link stat handler
+		bot.getListenerManager().addListener(new StatCollectionHandler(se, st, props));
+
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));
-		bot.getListenerManager().addListener(new SpeechHandler(bot,channel));
+		bot.getListenerManager().addListener(new SpeechHandler(bot,ircChannel));
 
+		//DISABLED
 		//set up twitter listener
-		bot.getListenerManager().addListener(new TwitterListener(bot, channel, props));
+		//bot.getListenerManager().addListener(new TwitterListener(bot, channel, props));
 	}
 }
 
