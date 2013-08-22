@@ -34,8 +34,8 @@ public class PresenceChecker {
 			throw ioe;
 		}
 
-		Elements nameelements = doc.select("outfit_list > outfit > members_list > members[id] > name"); 			
-		Elements statuselements = doc.select("outfit_list > outfit > members_list > members[id]");
+		Elements nameelements = doc.select("outfit_list > outfit > members_list > members[character_id] > name"); 			
+		Elements statuselements = doc.select("outfit_list > outfit > members_list > members[character_id]");
 		int size = nameelements.size();
 
 		for (int i=0;i<size;i++) {
