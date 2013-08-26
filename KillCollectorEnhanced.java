@@ -33,9 +33,9 @@ public class KillCollectorEnhanced {
 
 
 		if (soeapikey == null || soeapikey.equals("")) {
-			querystring = "http://census.soe.com/xml/get/ps2/event?type=KILL&after="+startingTimestamp+"&c:limit=1000&c:join=type:character^on:attacker_character_id^to:id^show:faction_id'battle_rank.value";
+			querystring = "http://census.soe.com/xml/get/ps2:v2/event?type=KILL&after="+startingTimestamp+"&c:limit=1000&c:join=type:character^on:attacker_character_id^to:character_id^show:faction_id'battle_rank.value";
 		} else {
-			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2/event?type=KILL&after="+startingTimestamp+"&c:limit=1000&c:join=type:character^on:attacker_character_id^to:id^show:faction_id'battle_rank.value";
+			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/event?type=KILL&after="+startingTimestamp+"&c:limit=1000&c:join=type:character^on:attacker_character_id^to:character_id^show:faction_id'battle_rank.value";
 		}
 		System.out.println("running "+ querystring);
 		try {
@@ -63,7 +63,7 @@ public class KillCollectorEnhanced {
 		java.sql.Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String insertString = "insert into kills (attacker_character_id, attacker_vehicle_id, attacker_weapon_id, character_id, is_critical, is_headshot, "+
+		String insertString = "insert into v2_kills (attacker_character_id, attacker_vehicle_id, attacker_weapon_id, character_id, is_critical, is_headshot, "+
 			"timestamp, world_id, zone_id, faction_id, br_value) values (?,?,?,?,?,?,?,?,?,?,?)";
 		String logString = "insert into api_pull (timestamp, dupes, first_timestamp_pulled, last_timestamp_pulled, write_time) values (?, ?, ?, ?, ?)";
 
