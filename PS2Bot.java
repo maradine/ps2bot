@@ -108,12 +108,12 @@ public class PS2Bot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new PresenceHandler(pe, pt, soeapikey));
 
 		//set up stat engine
-		StatCollectionEngine se = new StatCollectionEngine(bot, props);
-		Thread st = new Thread(se, "st");
-		st.start();
+		//StatCollectionEngine se = new StatCollectionEngine(bot, props);
+		//Thread st = new Thread(se, "st");
+		//st.start();
 
 		//link stat handler
-		bot.getListenerManager().addListener(new StatCollectionHandler(se, st, props));
+		//bot.getListenerManager().addListener(new StatCollectionHandler(se, st, props));
 
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));

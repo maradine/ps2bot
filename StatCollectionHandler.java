@@ -12,15 +12,15 @@ public class StatCollectionHandler extends ListenerAdapter {
 
 	private PermissionsManager pm;
 	private Scanner scanner;
-	private StatCollectionEngine se;
-	private Thread seThread;
+	private KillCollectionEngine kce;
+	private Thread kceThread;
 	private String soeapikey;
 	private Properties props;
 
-	public StatCollectionHandler(StatCollectionEngine se, Thread seThread, Properties props) {
+	public StatCollectionHandler(KillCollectionEngine kce, Thread kceThread, Properties props) {
 		super();
-		this.se = se;
-		this.seThread = seThread;
+		this.kce = kce;
+		this.kceThread = kceThread;
 		this.pm = PermissionsManager.getInstance();
 		this.soeapikey = props.getProperty("soeapikey");
 		System.out.println("StatHandler Initialized.");
@@ -52,7 +52,7 @@ public class StatCollectionHandler extends ListenerAdapter {
 							event.respond("Setting the interval requires a number, expressed in seconds.  Max 60.");
 						} else {
 							event.respond("Interval set to "+rawlong+" seconds.");
-							se.setInterval(rawlong*1000);
+							kce.setInterval(rawlong*1000);
 						}
 					}
 					break;
@@ -66,14 +66,14 @@ public class StatCollectionHandler extends ListenerAdapter {
 							event.respond("Setting the timeout requires a number, expressed in seconds.  Max 20.");
 						} else {
 							event.respond("Timeout set to "+rawint+" seconds.");
-							se.setTimeout(rawint*1000);
+							kce.setTimeout(rawint*1000);
 						}
 					}
 					break;
 					//
 					case "manual": try {
 						event.respond("Initiating manual pull from API.");
-						HashMap<String, Integer> results = KillCollector.collectKills(se.getTimeout(), props);
+						HashMap<String, Integer> results = KillCollector.collectKills(kce.getTimeout(), props);
 						event.respond("Stat run complete.  Duration: "+results.get("duration")+" millis.  Duplicates: "+results.get("skipCount")+" rows.");
 					} catch (SQLException sex) {
 						event.respond(sex.getMessage());
@@ -83,11 +83,11 @@ public class StatCollectionHandler extends ListenerAdapter {
 					break;
 					//
 					//
-					case "on": se.turnOn();
+					case "on": kce.turnOn();
 					event.respond("Automatic stat puller turned ON.");
 					break;
 					//
-					case "off": se.turnOff();
+					case "off": kce.turnOff();
 					event.respond("Automatic stat puller turned OFF.");
 					break;
 					//
