@@ -44,51 +44,22 @@ public class StatCollectionHandler extends ListenerAdapter {
 				token = scanner.next().toLowerCase();
 				switch (token) {
 					//
-					case "interval": if (!scanner.hasNextLong()){
-						event.respond("Setting the interval requires a number, expressed in seconds.  Max 60.");
-					} else {
-						long rawlong = scanner.nextLong();
-						if (rawlong > 60) {
-							event.respond("Setting the interval requires a number, expressed in seconds.  Max 60.");
-						} else {
-							event.respond("Interval set to "+rawlong+" seconds.");
-							kce.setInterval(rawlong*1000);
-						}
-					}
-					break;
-					//
-					//
-					case "timeout": if (!scanner.hasNextInt()){
-						event.respond("Setting the timeout requires a number, expressed in seconds.  Max 20.");
-					} else {
-						int rawint = scanner.nextInt();
-						if (rawint > 20) {
-							event.respond("Setting the timeout requires a number, expressed in seconds.  Max 20.");
-						} else {
-							event.respond("Timeout set to "+rawint+" seconds.");
-							kce.setTimeout(rawint*1000);
-						}
-					}
-					break;
-					//
-					case "manual": try {
-						event.respond("Initiating manual pull from API.");
-						HashMap<String, Integer> results = KillCollector.collectKills(kce.getTimeout(), props);
-						event.respond("Stat run complete.  Duration: "+results.get("duration")+" millis.  Duplicates: "+results.get("skipCount")+" rows.");
-					} catch (SQLException sex) {
-						event.respond(sex.getMessage());
-					} catch (IOException ioex) {
-						event.respond(ioex.getMessage());
-					}
-					break;
-					//
-					//
 					case "on": kce.turnOn();
 					event.respond("Automatic stat puller turned ON.");
 					break;
 					//
 					case "off": kce.turnOff();
 					event.respond("Automatic stat puller turned OFF.");
+					break;
+					//
+					case "status": boolean onSwitch = kce.isOn();
+					long interval = kce.getInterval();
+					int iSeconds = (int)interval / 1000;
+					if (onSwitch) {
+						event.respond("Kill Collection Engine is running.  Current interval at "+iSeconds+" seconds.  ~"+(850/(iSeconds+5))+"kps.");
+					} else {
+						event.respond("Kill Collection Engine is idle.");
+					}
 					break;
 					//
 					default: event.respond("I'm not sure what you asked me.  Valid commands are BLAH BLHA BLAH");
@@ -100,7 +71,7 @@ public class StatCollectionHandler extends ListenerAdapter {
 		
 		if (command.equals("!stats")) {
 	
-			event.respond("Cats!");
+			event.respond("http://bit.ly/1eVKYmh");
 		}
 	}
 }

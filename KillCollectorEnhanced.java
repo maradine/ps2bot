@@ -21,7 +21,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 
 public class KillCollectorEnhanced {
 
-	public static HashMap<String, Integer> collectKills(int timeout, Properties props) throws IOException, SQLException {
+	public static HashMap<String, Integer> collectKills(int timeout, long interval, Properties props) throws IOException, SQLException {
 		
 		Document doc = null;
 		org.jsoup.Connection jcon = null;
@@ -65,7 +65,7 @@ public class KillCollectorEnhanced {
 		ResultSet rs = null;
 		String insertString = "insert into v2_kills (attacker_character_id, attacker_vehicle_id, attacker_weapon_id, character_id, is_critical, is_headshot, "+
 			"timestamp, world_id, zone_id, faction_id, br_value) values (?,?,?,?,?,?,?,?,?,?,?)";
-		String logString = "insert into api_pull (timestamp, dupes, first_timestamp_pulled, last_timestamp_pulled, write_time) values (?, ?, ?, ?, ?)";
+		String logString = "insert into v2_api_pulls (timestamp, dupes, first_timestamp_pulled, last_timestamp_pulled, write_time, `interval`) values (?, ?, ?, ?, ?, ?)";
 
 		String dbServer = props.getProperty("db_server");
 		String database = props.getProperty("database");
@@ -161,6 +161,7 @@ public class KillCollectorEnhanced {
                         pstmt.setInt(3, minTimestamp);
                         pstmt.setInt(4, maxTimestamp);
                         pstmt.setInt(5, duration);
+                        pstmt.setLong(6, interval);
                         pstmt.executeUpdate();
 			conn.commit();
 
