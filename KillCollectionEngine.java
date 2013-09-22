@@ -19,6 +19,7 @@ public class KillCollectionEngine implements Runnable {
 	private String soeapikey;
 	private Properties props;	
 	private Boolean firstRun;
+	private long rowsProcessed;
 
 	public KillCollectionEngine(PircBotX bot, Properties props) {
 		this.bot = bot;
@@ -30,6 +31,7 @@ public class KillCollectionEngine implements Runnable {
 		backoff = 0L;
 		timeout = 10000;
 		firstRun = true;
+		rowsProcessed = 0L;
 	}
 
 	public void setInterval(long set) {
@@ -46,6 +48,10 @@ public class KillCollectionEngine implements Runnable {
 
 	public long getInterval() {
 		return interval;
+	}
+	
+	public long getRowsProcessed() {
+		return rowsProcessed;
 	}
 
 	public boolean isOn() {
@@ -82,6 +88,7 @@ public class KillCollectionEngine implements Runnable {
 								bot.sendMessage(props.getProperty("irc_channel"), "Dupe buffer too small - decreasing pull interval.  Next pull starts in "+interval/1000+" seconds.");
 							}
 						}
+						rowsProcessed += (1000 - results.get("skipCount"));
 						firstRun=false;
 					} catch (SocketTimeoutException stex) {
 						bot.sendMessage(props.getProperty("irc_channel"), "SOE timed out an API pull.  Call your congressman.");

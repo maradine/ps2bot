@@ -56,7 +56,7 @@ public class StatCollectionHandler extends ListenerAdapter {
 					long interval = kce.getInterval();
 					int iSeconds = (int)interval / 1000;
 					if (onSwitch) {
-						event.respond("Kill Collection Engine is running.  Current interval at "+iSeconds+" seconds.  ~"+(850/(iSeconds+5))+"kps.");
+						event.respond("Kill Collection Engine is running. "+kce.getRowsProcessed()+" kills processed. Current interval at "+iSeconds+" seconds.  ~"+(850/(iSeconds+5))+"kps.");
 					} else {
 						event.respond("Kill Collection Engine is idle.");
 					}

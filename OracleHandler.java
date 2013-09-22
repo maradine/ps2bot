@@ -3,6 +3,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.User;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Scanner;
@@ -10,6 +11,8 @@ import org.pircbotx.Colors;
 import java.util.Properties;
 import java.sql.SQLException;
 import java.io.IOException;
+import org.joda.time.DateTime;
+
 
 public class OracleHandler extends ListenerAdapter {
 
@@ -33,10 +36,10 @@ public class OracleHandler extends ListenerAdapter {
 		
 		if (commandLower.startsWith("!oracle ")) {
 			User user = event.getUser();
-			if (!pm.isAllowed("!oracle",event.getUser(),event.getChannel())) {
-				event.respond("Sorry, you are not in the access list for consulting the oracle.");
-				return;
-			}
+			//if (!pm.isAllowed("!oracle",event.getUser(),event.getChannel())) {
+			//	event.respond("Sorry, you are not in the access list for consulting the oracle.");
+			//	return;
+			//}
 			scanner = new Scanner(commandLower);
 			String token = scanner.next();
 			
@@ -57,6 +60,7 @@ public class OracleHandler extends ListenerAdapter {
 								ex.printStackTrace();
 								return;
 							}
+							event.respond("Delivering via PM.");
 							event.getBot().sendMessage(user, "Listing Types:");
 							SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
 							for (Integer key : keys) {
@@ -77,6 +81,7 @@ public class OracleHandler extends ListenerAdapter {
 									return;
 								}
 								if (hm.size() > 0) {
+									event.respond("Delivering via PM.");
 									event.getBot().sendMessage(user, "Listing Weapons:");
 									SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
 									for (Integer key : keys) {
@@ -91,13 +96,79 @@ public class OracleHandler extends ListenerAdapter {
 								event.respond("You need a type number. ex. !oracle list weapons 13");
 							}
 							
+						} else if (token.equals("periods")) {
+							ArrayList<TimePeriod> al = new ArrayList<TimePeriod>();
+							try {
+								al = Oracle.getPeriods(props);
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Check the logs, sparky.");
+								System.out.println(ex);
+								ex.printStackTrace();
+								return;
+							}
+							event.respond("Delivering via PM.");
+							event.getBot().sendMessage(user, "Listing Periods:");
+							for (TimePeriod tp : al) {
+								DateTime dt1 = new DateTime(tp.getStart()*1000L);
+								DateTime dt2 = new DateTime(tp.getEnd()*1000L);
+								event.getBot().sendMessage(user, "id: "+tp.getId()+" start: "+dt1.toString()+" end: "+dt2.toString()+" daily? "+tp.getIsDaily());
+							}
+							
 						}
 
+
+
+
 					} else {
-						event.respond("What would you like to list? types, weapons, or windows");
+						event.respond("What would you like to list? types, weapons, or periods");
 					}
-				
-				} else if (token.equals("some other thing")) {
+				//END OF 'LIST' HANDLING
+				//
+				//
+				//
+				} else if (token.equals("ask")) {
+					if (scanner.hasNext("weapon")) {
+						scanner.next();
+						if (scanner.hasNextInt()) {
+							int id = scanner.nextInt();
+							HashMap<String,String> hm=new HashMap<String,String>(); 
+							try {
+								if (scanner.hasNextInt()) {
+									int period = scanner.nextInt();
+									hm = Oracle.getKillAggregate(props,id,period);
+								} else {
+									hm = Oracle.getKillAggregate(props,id);
+								}
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Here's the gritty:");
+								event.respond(ex.getMessage());
+								return;
+							}
+							if (hm.size()>0) {
+								//event.respond("Prepare for Stats:");
+								event.respond(hm.get("name")+" -  kills: "+hm.get("kills")+" uniques: "+hm.get("uniques")+" kpu: "+hm.get("kpu")+" avgbr: "+hm.get("avgbr")+" q1kpu: "+hm.get("q1kpu")+" q2kpu: "+hm.get("q2kpu")+" q3kpu: "+hm.get("q3kpu")+" q4kpu: "+hm.get("q4kpu"));
+
+
+							} else {
+								event.respond("Was that a legit weapon id and period?  I didn't get anything back.");
+							}
+						} else {
+							event.respond("Need a weapon id and optionally a period.");
+						}
+					
+					} else if (scanner.hasNext("type")) {
+						//blah
+					} else {
+						event.respond("What, like, just in general? Try !oracle ask <weapon/type> [period]");
+					}
+				}
+				//END OF 'STATS' HANDLING
+				//
+				//
+				//
+
+
+				else if (token.equals("some other thing")) {
 					//blah
 				}
 

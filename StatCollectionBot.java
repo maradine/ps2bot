@@ -98,7 +98,7 @@ public class StatCollectionBot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new StatCollectionHandler(kce, kct, props));
 
 
-		//set up stat engine
+		//set up maintenance engine
 		MaintenanceEngine me = new MaintenanceEngine(bot, props);
 		Thread met = new Thread(me, "kct");
 		met.start();
@@ -107,7 +107,7 @@ public class StatCollectionBot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new MaintenanceHandler(me, met, props));
 
 		//link Oracle
-		bot.getListenerManager().addListener(new OracleHandler(props));
+		//bot.getListenerManager().addListener(new OracleHandler(props));
 
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));
