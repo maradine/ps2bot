@@ -1,6 +1,7 @@
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.User;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class OracleHandler extends ListenerAdapter {
 								ex.printStackTrace();
 								return;
 							}
-							event.respond("Delivering via PM.");
+							event.respond("Delivering via PM.  If you are planning on running a lot of these, do so in the PM window.");
 							event.getBot().sendMessage(user, "Listing Types:");
 							SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
 							for (Integer key : keys) {
@@ -81,7 +82,7 @@ public class OracleHandler extends ListenerAdapter {
 									return;
 								}
 								if (hm.size() > 0) {
-									event.respond("Delivering via PM.");
+									event.respond("Delivering via PM. If you are planning on running a lot of these, do so in the PM window.");
 									event.getBot().sendMessage(user, "Listing Weapons:");
 									SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
 									for (Integer key : keys) {
@@ -106,12 +107,159 @@ public class OracleHandler extends ListenerAdapter {
 								ex.printStackTrace();
 								return;
 							}
-							event.respond("Delivering via PM.");
+							event.respond("Delivering via PM.  If you are planning on running a lot of these, do so in the PM window.");
 							event.getBot().sendMessage(user, "Listing Periods:");
 							for (TimePeriod tp : al) {
 								DateTime dt1 = new DateTime(tp.getStart()*1000L);
 								DateTime dt2 = new DateTime(tp.getEnd()*1000L);
 								event.getBot().sendMessage(user, "id: "+tp.getId()+" start: "+dt1.toString()+" end: "+dt2.toString()+" daily? "+tp.getIsDaily());
+							}
+							
+						}
+
+					} else {
+						event.respond("What would you like to list? types, weapons, or periods");
+					}
+				//END OF 'LIST' HANDLING
+				//
+				//
+				//
+				} else if (token.equals("ask")) {
+					if (scanner.hasNext("weapon")) {
+						scanner.next();
+						if (scanner.hasNextInt()) {
+							int id = scanner.nextInt();
+							HashMap<String,String> hm=new HashMap<String,String>(); 
+							try {
+								if (scanner.hasNextInt()) {
+									int period = scanner.nextInt();
+									hm = Oracle.getKillAggregate(props,id,period);
+								} else {
+									hm = Oracle.getKillAggregate(props,id);
+								}
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Here's the gritty:");
+								event.respond(ex.getMessage());
+								return;
+							}
+							if (hm.size()>0) {
+								//event.respond("Prepare for Stats:");
+								event.respond(hm.get("name")+" -  kills: "+hm.get("kills")+" uniques: "+hm.get("uniques")+" kpu: "+hm.get("kpu")+" avgbr: "+hm.get("avgbr")+" q1kpu: "+hm.get("q1kpu")+" q2kpu: "+hm.get("q2kpu")+" q3kpu: "+hm.get("q3kpu")+" q4kpu: "+hm.get("q4kpu"));
+
+
+							} else {
+								event.respond("Was that a legit weapon id and period?  I didn't get anything back.");
+							}
+						} else {
+							event.respond("Need a weapon id and optionally a period.");
+						}
+					
+					} else if (scanner.hasNext("type")) {
+						//blah
+					} else {
+						event.respond("What, like, just in general? Try !oracle ask <weapon/type> [period]");
+					}
+				}
+				//END OF 'STATS' HANDLING
+				//
+				//
+				//
+
+
+				else if (token.equals("some other thing")) {
+					//blah
+				}
+
+				
+			}
+		}
+		
+		if (command.equals("!oracle")) {
+	
+			event.respond("What?");
+		}
+	}
+
+
+	public void onPrivateMessage(PrivateMessageEvent event) {
+		String command = event.getMessage();
+		String commandLower = command.toLowerCase();
+		
+		if (commandLower.startsWith("!oracle ")) {
+			User user = event.getUser();
+			//if (!pm.isAllowed("!oracle",event.getUser(),event.getChannel())) {
+			//	event.respond("Sorry, you are not in the access list for consulting the oracle.");
+			//	return;
+			//}
+			scanner = new Scanner(commandLower);
+			String token = scanner.next();
+			
+			if (scanner.hasNext()){
+				token = scanner.next();
+				
+				if (token.equals("list")) {
+					if (scanner.hasNext()) {
+						token = scanner.next();
+						
+						if (token.equals("types")) {
+							HashMap<Integer,String> hm;
+							try {
+								hm = Oracle.getTypes(props);
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Notify maradine.");
+								System.out.println(ex);
+								ex.printStackTrace();
+								return;
+							}
+							event.getBot().sendMessage(user, "Listing Types:");
+							SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
+							for (Integer key : keys) {
+								String type = hm.get(key);
+								event.respond(key+":  "+type);
+							}
+						
+						} else if (token.equals("weapons")) {
+							if (scanner.hasNextInt()) {
+								int type = scanner.nextInt();
+								HashMap<Integer,String> hm;
+								try {
+									hm = Oracle.getWeapons(props,type);
+								} catch (SQLException ex) {
+									event.respond("Downstream SQL Exception.  Notify maradine.");
+									System.out.println(ex);
+									ex.printStackTrace();
+									return;
+								}
+								if (hm.size() > 0) {
+									event.getBot().sendMessage(user, "Listing Weapons:");
+									SortedSet<Integer> keys = new TreeSet<Integer>(hm.keySet());
+									for (Integer key : keys) {
+										String weapon = hm.get(key);
+										event.respond(key+":  "+weapon);
+									}
+								} else {
+									event.respond("That's not a real type.  Not here.  Not in these parts.");
+								}
+								//
+							} else {
+								event.respond("You need a type number. ex. !oracle list weapons 13");
+							}
+							
+						} else if (token.equals("periods")) {
+							ArrayList<TimePeriod> al = new ArrayList<TimePeriod>();
+							try {
+								al = Oracle.getPeriods(props);
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Notify maradine.");
+								System.out.println(ex);
+								ex.printStackTrace();
+								return;
+							}
+							event.getBot().sendMessage(user, "Listing Periods:");
+							for (TimePeriod tp : al) {
+								DateTime dt1 = new DateTime(tp.getStart()*1000L);
+								DateTime dt2 = new DateTime(tp.getEnd()*1000L);
+								event.respond("id: "+tp.getId()+" start: "+dt1.toString()+" end: "+dt2.toString()+" daily? "+tp.getIsDaily());
 							}
 							
 						}
@@ -181,6 +329,11 @@ public class OracleHandler extends ListenerAdapter {
 			event.respond("What?");
 		}
 	}
+
+
+
+
+
 }
 
 

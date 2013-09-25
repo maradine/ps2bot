@@ -17,7 +17,6 @@ public class BanterBox extends ListenerAdapter {
 		
 		triggerCommands.add("!dicebag");
 		triggerCommands.add("!dickbag");
-		triggerCommands.add("!fortune");
 
 		outputSnark.add("You think you're clever, don't you.");
 		outputSnark.add("Does not compute.");

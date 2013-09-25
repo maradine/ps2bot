@@ -111,6 +111,7 @@ public class OracleBot extends ListenerAdapter {
 
 		//link general command handler
 		bot.getListenerManager().addListener(new GeneralHandler(bot));
+		bot.getListenerManager().addListener(new OracleBanterBox());
 		bot.getListenerManager().addListener(new SpeechHandler(bot,ircChannel));
 
 
