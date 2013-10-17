@@ -144,7 +144,11 @@ public class OracleHandler extends ListenerAdapter {
 							}
 							if (hm.size()>0) {
 								//event.respond("Prepare for Stats:");
-								event.respond(hm.get("name")+" -  kills: "+hm.get("kills")+" uniques: "+hm.get("uniques")+" kpu: "+hm.get("kpu")+" avgbr: "+hm.get("avgbr")+" q1kpu: "+hm.get("q1kpu")+" q2kpu: "+hm.get("q2kpu")+" q3kpu: "+hm.get("q3kpu")+" q4kpu: "+hm.get("q4kpu"));
+								event.respond(hm.get("name")+" -  kills: "+hm.get("kills")+
+											" uniques: "+hm.get("uniques")+
+											" kpu: "+hm.get("kpu")+" avgbr: "+hm.get("avgbr")+
+											" q1kpu: "+hm.get("q1kpu")+" q2kpu: "+hm.get("q2kpu")+
+											" q3kpu: "+hm.get("q3kpu")+" q4kpu: "+hm.get("q4kpu"));
 
 
 							} else {
@@ -159,7 +163,64 @@ public class OracleHandler extends ListenerAdapter {
 					} else {
 						event.respond("What, like, just in general? Try !oracle ask <weapon/type> [period]");
 					}
+				} else if (token.equals("dump")) {
+					if (scanner.hasNext("weapon")) {
+						scanner.next();
+						if (scanner.hasNextInt()) {
+							int id = scanner.nextInt();
+							try {
+								ArrayList<KillAggregateRow> al = Oracle.getAllKillAggregates(props, id);
+								int rows = al.size();
+								if (rows < 1) {
+									event.respond("Was that a legit weapon id?  I didn't get anything back.");
+								} else {
+									int startPeriod = al.get(0).getPeriod();
+									int endPeriod = al.get(rows-1).getPeriod();
+									String name = al.get(0).getName();
+									String pasteTitle = id+" "+name+" periods "+startPeriod+"-"+endPeriod;
+									String pasteBody = new String(pasteTitle);
+									pasteBody += "\r\n";
+									pasteBody += "period, kills, uniques, kpu, avgbr, q1kpu, q2kpu, q3kpu, q4kpu\r\n";
+									for (KillAggregateRow kar : al) {
+										pasteBody += kar.getPeriod()+","+
+												kar.getKills()+","+
+												kar.getUniques()+","+
+												kar.getKpu()+","+
+												kar.getAvgbr()+","+
+												kar.getQ1kpu()+","+
+												kar.getQ2kpu()+","+
+												kar.getQ3kpu()+","+
+												kar.getQ4kpu()+"\r\n";
+									}
+									try {
+										String url = PastebinHelper.postString(pasteTitle, pasteBody, props);
+										event.respond("Your results: "+url);
+										return;
+									}catch (Exception e) {
+										event.respond("Downstream IO Exception.  Get maradine.  Here's the gritty:");
+										event.respond(e.getMessage());
+										return;
+									}
+
+								}
+
+
+
+
+							} catch (SQLException ex) {
+								event.respond("Downstream SQL Exception.  Get maradine.  Here's the gritty:");
+								event.respond(ex.getMessage());
+								return;
+							}
+						} else {
+							event.respond("I need a weapon id - !oracle dump weapon <id>");
+						}
+
+					} else {
+						event.respond("Right now I can only dump weapons - !oracle dump weapon <id>");
+					}
 				}
+
 				//END OF 'STATS' HANDLING
 				//
 				//

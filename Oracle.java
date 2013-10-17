@@ -300,6 +300,64 @@ public class Oracle {
 		}
 	}
 
+	public static ArrayList<KillAggregateRow> getAllKillAggregates(Properties props, int id) throws SQLException {
+		//get every period for a weapon
+
+		Connection conn = null;
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+		ArrayList<KillAggregateRow> al = new ArrayList<KillAggregateRow>();
+		
+		try {
+			conn = getConnection(props);
+			String sqlString = "SELECT a.kills, a.uniques, round(a.kpu,1), round(a.avgbr,1), "+
+						"round(a.q1kpu,1), round(a.q2kpu,1), round(a.q3kpu,1), round(a.q4kpu,1), b.name, a.period "+
+						"FROM fkpk.v2_kill_aggregates as a, fkpk.v2_weapons as b "+
+						"WHERE item_id = ? "+
+						"AND a.item_id = b.id "+
+						"ORDER BY a.period ASC;";
+			stmt = conn.prepareStatement(sqlString);
+			stmt.setInt(1, id);
+			rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				KillAggregateRow kar = new KillAggregateRow(id, rs.getInt(1), rs.getInt(2), rs.getFloat(3), rs.getFloat(4), 
+										rs.getFloat(5), rs.getFloat(6), rs.getFloat(7), rs.getFloat(8), 
+										rs.getString(9), rs.getInt(10));
+				al.add(kar);
+			}
+			
+			return al;
+		} catch (SQLException ex) {
+
+                        System.out.println("SQLException: " + ex.getMessage());
+                        System.out.println("SQLState: " + ex.getSQLState());
+                        System.out.println("VendorError: " + ex.getErrorCode());
+			throw ex;
+                } finally {
+                        if (rs != null) {
+                                try {
+					rs.close();
+                                } catch (SQLException sqlEx) { } // ignore
+                                rs = null;
+                        }
+
+                        if (stmt != null) {
+                                try {
+                                        stmt.close();
+                                } catch (SQLException sqlEx) { } // ignore
+                                stmt = null;
+
+                        }
+                        if (conn != null) {
+                                try {
+                                        conn.close();
+                                } catch (SQLException sqlEx) { } // ignore
+                                conn = null;
+
+                        }
+		}
+	}
 
 }
 
