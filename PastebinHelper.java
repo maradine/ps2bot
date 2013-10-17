@@ -47,8 +47,8 @@ class PastebinHelper {
 		String returner;
 		try {
 			System.out.println(response2.getStatusLine());
-			System.out.println(convertStreamToString(response2.getEntity().getContent()));
 			returner = convertStreamToString(response2.getEntity().getContent());
+			System.out.println(returner);
 			HttpEntity entity2 = response2.getEntity();
 			// do something useful with the response body
 			// and ensure it is fully consumed

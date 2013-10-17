@@ -229,6 +229,8 @@ public class OracleHandler extends ListenerAdapter {
 
 				else if (token.equals("some other thing")) {
 					//blah
+				} else {
+					event.respond("I don't know how to do that.  'ask', 'list', and 'dump' are helpful.");
 				}
 
 				
