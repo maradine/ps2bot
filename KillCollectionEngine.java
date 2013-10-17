@@ -78,24 +78,28 @@ public class KillCollectionEngine implements Runnable {
 						if (!firstRun) {
 							if (results.get("skipCount") > 400) {
 								interval=interval+2000;
-								bot.sendMessage(props.getProperty("irc_channel"), "Lots of dupes - increasing pull interval.  Next pull starts in "+interval/1000+" seconds.");
+								bot.sendMessage(props.getProperty("irc_channel"), "Kill pull interval to "+interval/1000+" seconds.");
 							} else if (results.get("skipCount") > 250) {
 								interval=interval+1000;
-								bot.sendMessage(props.getProperty("irc_channel"), "Lots of dupes - increasing pull interval.  Next pull starts in "+interval/1000+" seconds.");
+								bot.sendMessage(props.getProperty("irc_channel"), "Kill pull interval to "+interval/1000+" seconds.");
 							} else if (results.get("skipCount") < 100) {
 								interval=interval-1000;
-								if (interval <0L) {interval = 0L;}
-								bot.sendMessage(props.getProperty("irc_channel"), "Dupe buffer too small - decreasing pull interval.  Next pull starts in "+interval/1000+" seconds.");
+								if (interval <1L) {
+									interval = 1L;
+									bot.sendMessage(props.getProperty("irc_channel"), "MARADINE: KILL PULL LOWER BOUND REACHED.  PATCH IN PROGRESS OR CRITICAL PERFORMANCE ISSUE.");
+								} else {
+									bot.sendMessage(props.getProperty("irc_channel"), "Kill pull interval to "+interval/1000+" seconds.");
+								}
 							}
 						}
 						rowsProcessed += (1000 - results.get("skipCount"));
 						firstRun=false;
 					} catch (SocketTimeoutException stex) {
-						bot.sendMessage(props.getProperty("irc_channel"), "SOE timed out an API pull.  Call your congressman.");
+						bot.sendMessage(props.getProperty("irc_channel"), "SOE timed out an API pull.  maradine alert.");
 					} catch (SQLException sex) {
 						bot.sendMessage(props.getProperty("irc_channel"), sex.getMessage());
 					} catch (IOException ioex) {
-						bot.sendMessage(props.getProperty("irc_channel"), "Unhandled IO Exception.  Someone get maradine.");
+						bot.sendMessage(props.getProperty("irc_channel"), "Unhandled IO Exception.  maradine alert.");
 						bot.sendMessage(props.getProperty("irc_channel"), ioex.getMessage());
 					}
 						

@@ -2,3 +2,21 @@
 - Add !presence outfit list
 - Add !presence outfit remove
 - Re-integrate twitter
+
+do a big weapon_play_time pull
+for each entry:
+	create key from character_id+item_id
+	get key from cache
+	if key exists and last_save < this last_save
+		compute diff of value field
+		insert time record into db
+		write new key to cache
+	else if key exists and last_save = this last_save
+		increment dupe count
+	else
+		query SOE for prior entry
+		compute diff of value field
+		insert time record into db
+		write new key to cache
+
+

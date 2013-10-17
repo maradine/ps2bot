@@ -62,6 +62,12 @@ public class StatCollectionHandler extends ListenerAdapter {
 					}
 					break;
 					//
+					case "playtime": try {
+						PlaytimeCollector.collectPlaytime(kce.getTimeout(), kce.getInterval(), props);
+					} catch (Exception e) {
+						event.respond(e.getMessage());
+					}
+					//
 					default: event.respond("I'm not sure what you asked me.  Valid commands are BLAH BLHA BLAH");
 					break;
 

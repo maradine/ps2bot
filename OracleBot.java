@@ -19,7 +19,7 @@ public class OracleBot extends ListenerAdapter {
 		try {
 			fis = new FileInputStream("oraclebot.properties");
 		} catch (IOException ioe) {
-			System.out.println("Can't find ps2bot.proprties in local directory.");
+			System.out.println("Can't find oraclebot.proprties in local directory.");
 			System.out.println("Wrting out example file and terminating.");
 			System.out.println("Modify this file and re-run.");
 			
@@ -36,6 +36,9 @@ public class OracleBot extends ListenerAdapter {
 				props.setProperty("database", "");
 				props.setProperty("db_username", "");
 				props.setProperty("db_password", "");
+				props.setProperty("pastebin_endpoint", "http://pastebin.com/api/api_post.php");
+				props.setProperty("pastebin_api_dev_key", "");
+				props.setProperty("pastebin_api_user_key", "");
 		
 				props.store(new FileOutputStream("oraclebot.properties"), null);
 			} catch (IOException ioe2) {
@@ -89,23 +92,6 @@ public class OracleBot extends ListenerAdapter {
 			bot.shutdown(true);
 		}
 
-		//set up stat engine
-		//KillCollectionEngine kce = new KillCollectionEngine(bot, props);
-		//Thread kct = new Thread(kce, "kct");
-		//kct.start();
-
-		//link stat handler
-		//bot.getListenerManager().addListener(new StatCollectionHandler(kce, kct, props));
-
-
-		//set up maintenance engine
-		//MaintenanceEngine me = new MaintenanceEngine(bot, props);
-		//Thread met = new Thread(me, "kct");
-		//met.start();
-
-		//link maintenance handler
-		//bot.getListenerManager().addListener(new MaintenanceHandler(me, met, props));
-
 		//link Oracle
 		bot.getListenerManager().addListener(new OracleHandler(props));
 
@@ -115,10 +101,6 @@ public class OracleBot extends ListenerAdapter {
 		bot.getListenerManager().addListener(new SpeechHandler(bot,ircChannel));
 
 
-
-		//DISABLED
-		//set up twitter listener
-		//bot.getListenerManager().addListener(new TwitterListener(bot, channel, props));
 	}
 }
 
