@@ -29,9 +29,9 @@ public class PlaytimeCollector {
 		String querystring;
 
 		if (soeapikey == null || soeapikey.equals("")) {
-			querystring = "http://census.soe.com/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=1000&c:show=character_id,item_id,last_save,value";
+			querystring = "http://census.soe.com/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=1000&c:show=character_id,item_id,last_save,value,vehicle_id";
 		} else {
-			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=1000&c:show=character_id,item_id,last_save,value";
+			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=1000&c:show=character_id,item_id,last_save,value,vehicle_id";
 		}
 		System.out.println("running "+ querystring);
 		try {
@@ -45,14 +45,15 @@ public class PlaytimeCollector {
 			throw ioe;
 		}
 
-		Elements playtimeEvents = doc.select("characters_weapons_stat_list > characters_weapon_stat");
+		Elements playtimeEvents = doc.select("characters_weapon_stat_list > characters_weapon_stat");
 
 		for (Element e : playtimeEvents) {
 			String characterId = e.attr("character_id");
 			String itemId = e.attr("item_id");
 			String lastSave = e.attr("last_save");
 			String value = e.attr("value");
-			System.out.println("ELEMENT: "+characterId+" "+itemId+" "+lastSave+" "+value);
+			String vehicleId = e.attr("vehicle_id");
+			System.out.println("ELEMENT: "+characterId+" "+itemId+" "+lastSave+" "+value+" "+vehicleId);
 		}
 		
 /*
