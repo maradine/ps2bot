@@ -21,7 +21,7 @@ public class OracleBanterBox extends ListenerAdapter {
 		triggerCommands.add("!fortune");
 
 		outputSnark.add("You're gonna die.");
-		outputSnark.add("Cubs take the pennant in 2016");
+		outputSnark.add("Cubs take the pennant in 2016.");
 		outputSnark.add("Cancer.  Sorry.");
 		outputSnark.add("You don't want to know.");
 		outputSnark.add("Have you seen The Terminator?");
@@ -29,6 +29,11 @@ public class OracleBanterBox extends ListenerAdapter {
 		outputSnark.add("Steve Jobs returns from the dead, gets rehired.  Jesus returns as VP PR.");
 		outputSnark.add("If I told you, would you be any happier?");
 		outputSnark.add("The Striker gets nerfed.  Just kidding.");
+		outputSnark.add("#kingdong");
+		outputSnark.add("Everything is blurry.  I smoked a bowl.");
+		outputSnark.add("Shoe Event Horizon.");
+		outputSnark.add("Rand Paul wins the 2016 presidential election.  What?  No, of course not here.");
+		outputSnark.add("You're a wizard, Harry.");
 		outputSnark.add("I see a Vanu dance party.  I see spandex.  I see you at the center of a large circle.  I see where this is going.");
 
 		rand = new Random();
