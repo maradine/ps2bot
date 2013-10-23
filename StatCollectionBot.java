@@ -26,7 +26,7 @@ public class StatCollectionBot extends ListenerAdapter {
 			try {
 				props.setProperty("irc_server", "irc.slashnet.org");
 				props.setProperty("irc_channel", "#planetside2");
-				props.setProperty("botnick", "ps2bot");
+				props.setProperty("botnick", "statbot");
 				props.setProperty("nickpass", "");
 				props.setProperty("ownernick", "");
 				props.setProperty("channelpass", "");
@@ -36,6 +36,7 @@ public class StatCollectionBot extends ListenerAdapter {
 				props.setProperty("database", "");
 				props.setProperty("db_username", "");
 				props.setProperty("db_password", "");
+				props.setProperty("memcached_server", "");
 		
 				props.store(new FileOutputStream("statcollectionbot.properties"), null);
 			} catch (IOException ioe2) {

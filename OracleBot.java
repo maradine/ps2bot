@@ -26,7 +26,7 @@ public class OracleBot extends ListenerAdapter {
 			try {
 				props.setProperty("irc_server", "irc.slashnet.org");
 				props.setProperty("irc_channel", "#planetside2");
-				props.setProperty("botnick", "ps2bot");
+				props.setProperty("botnick", "oraclebot");
 				props.setProperty("nickpass", "");
 				props.setProperty("ownernick", "");
 				props.setProperty("channelpass", "");

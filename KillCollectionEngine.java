@@ -29,7 +29,7 @@ public class KillCollectionEngine implements Runnable {
 		onSwitch = false;
 		interval = 15000L;
 		backoff = 0L;
-		timeout = 10000;
+		timeout = 15000;
 		firstRun = true;
 		rowsProcessed = 0L;
 	}

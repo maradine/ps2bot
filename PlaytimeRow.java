@@ -3,19 +3,22 @@ class PlaytimeRow {
 	private int itemId;
 	private long lastSave;
 	private int value;
+	private int vehicleId;
 
 	public PlaytimeRow() {
 		this.characterId=0L;
 		this.itemId=0;
 		this.lastSave=0L;
 		this.value=0;
+		this.vehicleId=0;
 	}
 
-	public PlaytimeRow(long s1, int s2, long s3, int s4) {
+	public PlaytimeRow(long s1, int s2, long s3, int s4, int s5) {
 		this.characterId = s1;
 		this.itemId = s2;
 		this.lastSave = s3;
 		this.value = s4;
+		this.vehicleId = s5;
 	}
 
 
@@ -30,6 +33,9 @@ class PlaytimeRow {
 	}
 	public int getValue() {
 		return this.value;
+	}
+	public int getVehicleId() {
+		return this.vehicleId;
 	}
 }
 

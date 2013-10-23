@@ -16,6 +16,30 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.DriverManager;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.BinaryConnectionFactory;
+import net.spy.memcached.AddrUtil;
+
+
+
+/*
+do a big weapon_play_time pull
+for each entry:
+	create key from character_id+item_id
+	get key from cache
+	if key exists and last_save < this last_save
+		compute diff of value field
+		insert time record into db
+		write new key to cache
+	else if key exists and last_save = this last_save
+		increment dupe count
+	else
+		query SOE for prior entry
+		compute diff of value field
+		insert time record into db
+		write new key to cache
+
+*/
 
 
 
@@ -27,6 +51,9 @@ public class PlaytimeCollector {
 		org.jsoup.Connection jcon = null;
 		String soeapikey = props.getProperty("soeapikey");
 		String querystring;
+		
+		String memcachedServer = props.getProperty("memcached_server");
+		MemcachedClient mcc = new MemcachedClient(new BinaryConnectionFactory(),AddrUtil.getAddresses(memcachedServer));
 
 		if (soeapikey == null || soeapikey.equals("")) {
 			querystring = "http://census.soe.com/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=1000&c:show=character_id,item_id,last_save,value,vehicle_id";
@@ -54,8 +81,22 @@ public class PlaytimeCollector {
 			String value = e.attr("value");
 			String vehicleId = e.attr("vehicle_id");
 			System.out.println("ELEMENT: "+characterId+" "+itemId+" "+lastSave+" "+value+" "+vehicleId);
+			
+			PlaytimeRow ptr = new PlaytimeRow(Long.parseLong(characterId), Integer.parseInt(itemId), Long.parseLong(lastSave), Integer.parseInt(value), Integer.parseInt(vehicleId));
+			String cacheKey = characterId+"+"+itemId;
+			Object cachedPtrObj = mcc.get(cacheKey);
+			if (cachedPtrObj == null) {
+				System.out.println("KEY "+cacheKey+" IS NOT IN CACHE");
+			} else { 
+				System.out.println("KEY "+cacheKey+" CACHE HIT");
+			}
+
 		}
 		
+
+
+
+
 /*
 
 		try {
