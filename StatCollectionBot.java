@@ -90,14 +90,22 @@ public class StatCollectionBot extends ListenerAdapter {
 			bot.shutdown(true);
 		}
 
-		//set up stat engine
+		//set up kill engine
 		KillCollectionEngine kce = new KillCollectionEngine(bot, props);
 		Thread kct = new Thread(kce, "kct");
 		kct.start();
 
-		//link stat handler
-		bot.getListenerManager().addListener(new StatCollectionHandler(kce, kct, props));
+		//link kill handler
+		bot.getListenerManager().addListener(new KillCollectionHandler(kce, kct, props));
 
+
+		//set up playtime engine
+		PlaytimeCollectionEngine pce = new PlaytimeCollectionEngine(bot, props);
+		Thread pct = new Thread(pce, "pct");
+		pct.start();
+
+		//link playtime handler
+		bot.getListenerManager().addListener(new PlaytimeCollectionHandler(pce, pct, props));
 
 		//set up maintenance engine
 		MaintenanceEngine me = new MaintenanceEngine(bot, props);

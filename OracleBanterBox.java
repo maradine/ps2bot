@@ -46,7 +46,6 @@ public class OracleBanterBox extends ListenerAdapter {
 		String command = rawcommand.toLowerCase();
 		
 		if (command.startsWith("!presents ") || command.equals("!presents")) {
-			event.respond("(ノಠ益ಠ)ノ彡┻━┻");
 
 		} else {
 			boolean returnFire = false;
