@@ -63,14 +63,15 @@ public class PlaytimeCollector {
 		mcc = new MemcachedClient(new BinaryConnectionFactory(),AddrUtil.getAddresses(memcachedServer));
 
 		if (soeapikey == null || soeapikey.equals("")) {
-			querystring = "http://census.soe.com/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=5000&c:show=character_id,item_id,last_save,value,vehicle_id";
+			querystring = "http://census.soe.com/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=5000&c:join=type:character^on:character_id^to:character_id^show:faction_id'battle_rank.value";
 		} else {
-			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=5000&c:show=character_id,item_id,last_save,value,vehicle_id";
+			querystring = "http://census.soe.com/s:"+soeapikey+"/xml/get/ps2:v2/characters_weapon_stat?stat_name=weapon_play_time&c:sort=last_save_date:-1&c:limit=5000&c:join=type:character^on:character_id^to:character_id^show:faction_id'battle_rank.value";
 		}
 		System.out.println("running "+ querystring);
 		try {
 			jcon = Jsoup.connect(querystring);
 			jcon.timeout(timeout);
+			jcon.maxBodySize(0);
 			jcon.parser(Parser.xmlParser());
 			doc = jcon.get();
 		} catch (IOException ioe) {
@@ -80,7 +81,7 @@ public class PlaytimeCollector {
 		}
 
 		Elements playtimeEvents = doc.select("characters_weapon_stat_list > characters_weapon_stat");
-
+		//System.out.println("GOT "+playtimeEvents.size()+" ROWS FROM DOC.SELECT");
 		int hitCounter = 0;
 		int dupeCounter = 0;
 		int updateCounter = 0;
@@ -94,13 +95,26 @@ public class PlaytimeCollector {
 			String lastSave = el.attr("last_save");
 			String value = el.attr("value");
 			String vehicleId = el.attr("vehicle_id");
+			
+			int factionId=-1;
+			if (el.childNodeSize()>0) {
+				factionId = Integer.parseInt(el.childNode(0).attr("faction_id"));
+			}
+                               
+			int brValue=-1;
+			if (el.childNodeSize()>0) {
+				if (el.childNode(0).childNodeSize()>0) {
+					brValue = Integer.parseInt(el.childNode(0).childNode(0).attr("value"));
+				}
+			}
+			
 			//System.out.println("ELEMENT: "+characterId+" "+itemId+" "+lastSave+" "+value+" "+vehicleId);
 			
 			if (Integer.parseInt(lastSave) < pullTimestamp) {
 				pullTimestamp = Integer.parseInt(lastSave);
 			}
 
-			PlaytimeRow ptr = new PlaytimeRow(Long.parseLong(characterId), Integer.parseInt(itemId), Integer.parseInt(lastSave), Integer.parseInt(value), Integer.parseInt(vehicleId));
+			PlaytimeRow ptr = new PlaytimeRow(Long.parseLong(characterId), Integer.parseInt(itemId), Integer.parseInt(lastSave), Integer.parseInt(value), Integer.parseInt(vehicleId), factionId, brValue);
 			String cacheKey = characterId+"+"+itemId+"+"+vehicleId;
 			Future<Object> future = mcc.asyncGet(cacheKey);
 			Object cachedObject = null;
@@ -169,12 +183,18 @@ public class PlaytimeCollector {
 
 		}
 
+
+		mcc.shutdown();
+
 		System.out.println(playtimeEvents.size() + " playtime events processed.");
 		System.out.println(hitCounter + " cache hits.");
 		System.out.println(dupeCounter + " duplicate events.");
 		System.out.println(updateCounter + " events updated.");
 		int newRows = playtimeEvents.size() - dupeCounter;
 		float percentWarm = (float)updateCounter / (float)newRows * 100;
+		if (Float.isNaN(percentWarm)) {
+			percentWarm = 0f;
+		}
 				
 		System.out.println("Cache is "+percentWarm+"% warm.");
 		
@@ -197,7 +217,7 @@ public class PlaytimeCollector {
 		java.sql.Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String insertString = "insert into v2_playtimes (character_id, item_id, last_save, vehicle_id, diff) values (?,?,?,?,?)";
+		String insertString = "insert into v2_playtimes (character_id, item_id, last_save, vehicle_id, diff, faction_id, br_value) values (?,?,?,?,?,?,?)";
 		String logString = "insert into v2_api_pulls (timestamp, dupes, first_timestamp_pulled, last_timestamp_pulled, write_time, `interval`, stat, cache_heat, updated_rows) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		String dbServer = props.getProperty("db_server");
@@ -223,6 +243,8 @@ public class PlaytimeCollector {
                                 pstmt.setLong(3,ptr.getLastSave());
                                 pstmt.setInt(4,ptr.getVehicleId());
                                 pstmt.setInt(5,ptr.getValue());
+                                pstmt.setInt(6,ptr.getFactionId());
+                                pstmt.setInt(7,ptr.getBrValue());
 				
 				pstmt.addBatch();
                                 //System.out.println("for shits, last save is "+ptr.getLastSave());

@@ -4,6 +4,8 @@ class PlaytimeRow implements java.io.Serializable {
 	private int lastSave;
 	private int value;
 	private int vehicleId;
+	private int factionId;
+	private int brValue;
 
 	public PlaytimeRow() {
 		this.characterId=0L;
@@ -11,14 +13,18 @@ class PlaytimeRow implements java.io.Serializable {
 		this.lastSave=0;
 		this.value=0;
 		this.vehicleId=0;
+		this.factionId=0;
+		this.brValue=0;
 	}
 
-	public PlaytimeRow(long s1, int s2, int s3, int s4, int s5) {
+	public PlaytimeRow(long s1, int s2, int s3, int s4, int s5, int s6, int s7) {
 		this.characterId = s1;
 		this.itemId = s2;
 		this.lastSave = s3;
 		this.value = s4;
 		this.vehicleId = s5;
+		this.factionId = s6;
+		this.brValue = s7;
 	}
 
 
@@ -37,6 +43,14 @@ class PlaytimeRow implements java.io.Serializable {
 	public int getVehicleId() {
 		return this.vehicleId;
 	}
+	public int getFactionId() {
+		return this.factionId;
+	}
+	public int getBrValue() {
+		return this.brValue;
+	}
+	
+	
 	
 	public void setValue(int setter) {
 		this.value = setter;
