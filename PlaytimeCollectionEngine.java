@@ -23,6 +23,7 @@ public class PlaytimeCollectionEngine implements Runnable {
 	private Properties props;	
 	private Boolean firstRun;
 	private long rowsProcessed;
+	private float cacheHeat;
 
 	public PlaytimeCollectionEngine(PircBotX bot, Properties props) {
 		this.bot = bot;
@@ -36,6 +37,7 @@ public class PlaytimeCollectionEngine implements Runnable {
 		timeout = 15000;
 		firstRun = true;
 		rowsProcessed = 0L;
+		cacheHeat = 0f;
 	}
 
 	public void setInterval(long set) {
@@ -60,6 +62,10 @@ public class PlaytimeCollectionEngine implements Runnable {
 
 	public boolean isOn() {
 		return onSwitch;
+	}
+	
+	public float getCacheHeat() {
+		return cacheHeat;
 	}
 	
 	public boolean isHot() {
@@ -87,8 +93,8 @@ public class PlaytimeCollectionEngine implements Runnable {
 						int updateCounter = results.get("updateCounter");
 						int dupeCounter = results.get("dupeCounter");
 						int hitCounter = results.get("hitCounter");
-						float percentWarm = (float)updateCounter / (float)newRows * 100;
-						bot.sendMessage(props.getProperty("irc_channel"), "Processed "+playtimeEvents+" events.  "+hitCounter+" cache hits.  "+dupeCounter+" duplicates in pull.  "+updateCounter+" rows updated.  "+percentWarm+"% cache heat.");
+						cacheHeat = (float)updateCounter / (float)newRows * 100;
+						bot.sendMessage(props.getProperty("irc_channel"), "Processed "+playtimeEvents+" events.  "+hitCounter+" cache hits.  "+dupeCounter+" duplicates in pull.  "+updateCounter+" rows updated.  "+cacheHeat+"% cache heat.");
 						if (!firstRun) {
 							if (results.get("dupeCounter") > 3000) {
 								interval=interval+5000;

@@ -28,7 +28,7 @@ public class PlaytimeCollectionHandler extends ListenerAdapter {
 		this.pceThread = pceThread;
 		this.pm = PermissionsManager.getInstance();
 		this.soeapikey = props.getProperty("soeapikey");
-		System.out.println("StatHandler Initialized.");
+		System.out.println("PlaytimeCollectionHandler Initialized.");
 		this.props = props;
 	}
 
@@ -55,15 +55,6 @@ public class PlaytimeCollectionHandler extends ListenerAdapter {
 					//
 					case "off": pce.turnOff();
 					event.respond("Automatic stat puller turned OFF.");
-					break;
-					//
-					case "status": boolean onSwitch = pce.isOn();
-					long interval = pce.getInterval();
-					if (onSwitch) {
-						event.respond("Playtime Collection Engine is running. "+pce.getRowsProcessed()+" rows processed. Current interval at "+pce.getInterval()+" seconds.");
-					} else {
-						event.respond("Playtime Collection Engine is idle.");
-					}
 					break;
 					//
 					case "playtime": try {
@@ -120,6 +111,17 @@ public class PlaytimeCollectionHandler extends ListenerAdapter {
 					break;
 
 				}
+			}
+		}
+
+		if (command.equals("!status")) {
+	
+			boolean onSwitch = pce.isOn();
+			long interval = pce.getInterval();
+			if (onSwitch) {
+				event.respond("Playtime Collection Engine is running. "+pce.getRowsProcessed()+" rows processed. Current interval at "+pce.getInterval()+" seconds.  Cache heat at "+pce.getCacheHeat()+"%");
+			} else {
+				event.respond("Playtime Collection Engine is idle.");
 			}
 		}
 		

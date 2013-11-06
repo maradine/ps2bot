@@ -28,7 +28,7 @@ public class KillCollectionHandler extends ListenerAdapter {
 		this.kceThread = kceThread;
 		this.pm = PermissionsManager.getInstance();
 		this.soeapikey = props.getProperty("soeapikey");
-		System.out.println("StatHandler Initialized.");
+		System.out.println("KillCollectionHandler Initialized.");
 		this.props = props;
 	}
 
@@ -55,16 +55,6 @@ public class KillCollectionHandler extends ListenerAdapter {
 					//
 					case "off": kce.turnOff();
 					event.respond("Automatic stat puller turned OFF.");
-					break;
-					//
-					case "status": boolean onSwitch = kce.isOn();
-					long interval = kce.getInterval();
-					int iSeconds = (int)interval / 1000;
-					if (onSwitch) {
-						event.respond("Kill Collection Engine is running. "+kce.getRowsProcessed()+" kills processed. Current interval at "+iSeconds+" seconds.  ~"+(850/(iSeconds+5))+"kps.");
-					} else {
-						event.respond("Kill Collection Engine is idle.");
-					}
 					break;
 					//
 					case "playtime": try {
@@ -124,9 +114,16 @@ public class KillCollectionHandler extends ListenerAdapter {
 			}
 		}
 		
-		if (command.equals("!stats")) {
+		if (command.equals("!status")) {
 	
-			event.respond("http://bit.ly/1eVKYmh");
+			boolean onSwitch = kce.isOn();
+			long interval = kce.getInterval();
+			int iSeconds = (int)interval / 1000;
+			if (onSwitch) {
+				event.respond("Kill Collection Engine is running. "+kce.getRowsProcessed()+" kills processed. Current interval at "+iSeconds+" seconds.  ~"+(850/(iSeconds+5))+"kps.");
+			} else {
+				event.respond("Kill Collection Engine is idle.");
+			}
 		}
 	}
 }
