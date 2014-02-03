@@ -41,6 +41,12 @@ public class BanterBox extends ListenerAdapter {
 		if (command.startsWith("!presents ") || command.equals("!presents")) {
 			event.respond("(ノಠ益ಠ)ノ彡┻━┻");
 
+		} else if (command.startsWith("!pokemon") || command.equals("!pokemon")) {
+			event.respond("http://images.wikia.com/pokemontowerdefense/images/9/96/Pokemon-list.png");
+		
+		} else if (command.startsWith("!pokemans") || command.equals("!pokemams")) {
+			event.respond("http://images.wikia.com/pokemontowerdefense/images/9/96/Pokemon-list.png");
+		
 		} else {
 			boolean returnFire = false;
 			for (String triggerString : triggerCommands) {

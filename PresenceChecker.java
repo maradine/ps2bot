@@ -33,7 +33,7 @@ public class PresenceChecker {
 			System.out.println(ioe);
 			throw ioe;
 		}
-
+		/*
 		Elements nameelements = doc.select("outfit_list > outfit > members_list > members[character_id] > name"); 			
 		Elements statuselements = doc.select("outfit_list > outfit > members_list > members[character_id]");
 		int size = nameelements.size();
@@ -46,6 +46,21 @@ public class PresenceChecker {
 				status = true;
 			}
 			hm.put(name,status);
+		}
+		*/
+
+		Elements statuselements = doc.select("outfit_list > outfit > members_list > members[character_id]");
+
+		for (Element e : statuselements) {
+			if (e.childNodeSize() == 1) {
+				String name = e.childNode(0).attr("first");
+				String statusstring = e.attr("online_status");
+				Boolean status = false;
+				if (!statusstring.equals("0")) {
+					status = true;
+				}
+				hm.put(name,status);
+			}
 		}
 
 		return hm;
